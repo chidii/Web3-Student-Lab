@@ -3,12 +3,23 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState } from 'react';
+import { useAuth } from '@/contexts/AuthContext';
 
 export default function Navbar() {
   const pathname = usePathname();
+  const { user, logout } = useAuth();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const isActive = (path: string) => pathname === path;
+
+  const navLinks = [
+    { name: 'MODULES', path: '/courses' },
+    { name: 'ROADMAP', path: '/roadmap' },
+    { name: 'PLAYGROUND', path: '/playground' },
+    { name: 'SIMULATOR', path: '/simulator' },
+    { name: 'IDEAS', path: '/ideas' },
+    { name: 'VERIFY', path: '/verify' },
+  ];
 
   return (
     <nav className="sticky top-0 z-50 w-full border-b border-white/10 bg-black/80 backdrop-blur-md">
@@ -30,40 +41,73 @@ export default function Navbar() {
           </div>
           
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center gap-8">
-            <Link
-              href="/courses"
-              className={`text-sm font-bold tracking-wide transition-colors ${
-                isActive('/courses') ? 'text-red-500' : 'text-gray-300 hover:text-white'
-              }`}
-            >
-              MODULES
-            </Link>
-            <Link
-              href="/verify"
-              className={`text-sm font-bold tracking-wide transition-colors ${
-                isActive('/verify') ? 'text-red-500' : 'text-gray-300 hover:text-white'
-              }`}
-            >
-              VERIFY
-            </Link>
-            <div className="w-px h-6 bg-white/20"></div>
-            <Link
-              href="/auth/login"
-              className="text-sm font-bold tracking-wide text-gray-300 hover:text-white transition-colors"
-            >
-              SIGN IN
-            </Link>
-            <Link
-              href="/auth/register"
-              className="px-6 py-2.5 bg-red-600 hover:bg-red-700 text-white text-sm font-bold tracking-wide rounded border border-red-500 shadow-[0_0_15px_rgba(220,38,38,0.4)] hover:shadow-[0_0_25px_rgba(220,38,38,0.6)] transition-all uppercase"
-            >
-              Initialize Node
-            </Link>
+          <div className="hidden xl:flex items-center gap-6">
+            {navLinks.map((link) => (
+              <Link
+                key={link.path}
+                href={link.path}
+                className={`text-[10px] font-black tracking-[0.2em] transition-colors uppercase ${
+                  isActive(link.path) ? 'text-red-500' : 'text-gray-400 hover:text-white'
+                }`}
+              >
+                {link.name}
+              </Link>
+            ))}
+          </div>
+
+          <div className="hidden md:flex items-center gap-4">
+             {user ? (
+              <div className="flex items-center gap-4">
+                <Link
+                  href="/dashboard"
+                  className={`text-[10px] font-black tracking-[0.2em] px-4 py-2 border rounded transition-all uppercase ${
+                    isActive('/dashboard') 
+                      ? 'bg-red-600 border-red-500 text-white shadow-[0_0_15px_rgba(220,38,38,0.4)]' 
+                      : 'border-white/10 text-gray-400 hover:text-white hover:border-red-500/50'
+                  }`}
+                >
+                  DASHBOARD
+                </Link>
+                <Link
+                  href="/certificates"
+                  className={`text-[10px] font-black tracking-[0.2em] px-4 py-2 border rounded transition-all uppercase ${
+                    isActive('/certificates') 
+                      ? 'bg-red-600 border-red-500 text-white shadow-[0_0_15px_rgba(220,38,38,0.4)]' 
+                      : 'border-white/10 text-gray-400 hover:text-white hover:border-red-500/50'
+                  }`}
+                >
+                  VAULT
+                </Link>
+                <button
+                  onClick={logout}
+                  className="w-10 h-10 rounded-full bg-zinc-900 border border-white/10 flex items-center justify-center hover:border-red-500/50 transition-colors group"
+                  title="Logout"
+                >
+                   <svg className="w-5 h-5 text-gray-500 group-hover:text-red-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                   </svg>
+                </button>
+              </div>
+            ) : (
+              <div className="flex items-center gap-4">
+                <Link
+                  href="/auth/login"
+                  className="text-[10px] font-black tracking-[0.2em] text-gray-400 hover:text-white transition-colors uppercase"
+                >
+                  SIGN IN
+                </Link>
+                <Link
+                  href="/auth/register"
+                  className="px-6 py-2.5 bg-red-600 hover:bg-red-700 text-white text-[10px] font-black tracking-[0.2em] rounded border border-red-500 shadow-[0_0_15px_rgba(220,38,38,0.4)] hover:shadow-[0_0_25px_rgba(220,38,38,0.6)] transition-all uppercase"
+                >
+                  INITIALIZE
+                </Link>
+              </div>
+            )}
           </div>
 
           {/* Mobile Menu Button */}
-          <div className="md:hidden flex items-center">
+          <div className="xl:hidden flex items-center">
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
               className="text-gray-300 hover:text-white focus:outline-none"
@@ -82,36 +126,54 @@ export default function Navbar() {
 
       {/* Mobile Menu Panel */}
       {isMobileMenuOpen && (
-        <div className="md:hidden bg-black border-b border-white/10 px-4 pt-2 pb-6 space-y-4 shadow-2xl">
-          <Link
-            href="/courses"
-            onClick={() => setIsMobileMenuOpen(false)}
-            className="block px-3 py-2 text-base font-bold text-gray-300 hover:text-white hover:bg-white/5 rounded-md uppercase"
-          >
-            Modules
-          </Link>
-          <Link
-            href="/verify"
-            onClick={() => setIsMobileMenuOpen(false)}
-            className="block px-3 py-2 text-base font-bold text-gray-300 hover:text-white hover:bg-white/5 rounded-md uppercase"
-          >
-            Verify Certificate
-          </Link>
+        <div className="xl:hidden bg-black border-b border-white/10 px-4 pt-2 pb-6 space-y-2 shadow-2xl">
+          {navLinks.map((link) => (
+            <Link
+              key={link.path}
+              href={link.path}
+              onClick={() => setIsMobileMenuOpen(false)}
+              className={`block px-3 py-3 text-sm font-black tracking-widest uppercase rounded-md transition-colors ${
+                isActive(link.path) ? 'bg-red-500/10 text-red-500' : 'text-gray-400 hover:text-white hover:bg-white/5'
+              }`}
+            >
+              {link.name}
+            </Link>
+          ))}
           <div className="h-px w-full bg-white/10 my-2"></div>
-          <Link
-            href="/auth/login"
-            onClick={() => setIsMobileMenuOpen(false)}
-            className="block px-3 py-2 text-base font-bold text-gray-300 hover:text-white hover:bg-white/5 rounded-md uppercase"
-          >
-            Sign In
-          </Link>
-          <Link
-            href="/auth/register"
-            onClick={() => setIsMobileMenuOpen(false)}
-            className="block px-3 py-2 text-base font-bold text-red-500 hover:text-red-400 hover:bg-red-500/10 rounded-md uppercase"
-          >
-            Initialize Node (Register)
-          </Link>
+          {user ? (
+            <>
+              <Link
+                href="/dashboard"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="block px-3 py-3 text-sm font-black tracking-widest text-white uppercase bg-red-600 rounded-md"
+              >
+                Dashboard
+              </Link>
+              <button
+                onClick={() => { logout(); setIsMobileMenuOpen(false); }}
+                className="block w-full text-left px-3 py-3 text-sm font-black tracking-widest text-red-500 uppercase hover:bg-red-500/10 rounded-md"
+              >
+                Logout
+              </button>
+            </>
+          ) : (
+            <>
+              <Link
+                href="/auth/login"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="block px-3 py-3 text-sm font-black tracking-widest text-gray-400 hover:text-white uppercase"
+              >
+                Sign In
+              </Link>
+              <Link
+                href="/auth/register"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="block px-3 py-3 text-sm font-black tracking-widest text-red-500 hover:text-red-400 uppercase"
+              >
+                Initialize
+              </Link>
+            </>
+          )}
         </div>
       )}
     </nav>
