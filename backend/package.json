@@ -27,7 +27,8 @@
     "jsonwebtoken": "^9.0.2",
     "openai": "^6.32.0",
     "pg": "^8.20.0",
-    "prisma": "^7.5.0"
+    "prisma": "^7.5.0",
+    "zod": "^4.3.6"
   },
   "devDependencies": {
     "@types/bcryptjs": "^2.4.6",
