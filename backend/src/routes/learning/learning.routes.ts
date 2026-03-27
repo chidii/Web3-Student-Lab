@@ -1,5 +1,6 @@
 import { Router, Request, Response } from 'express';
-import { Module, Lesson, Progress } from './types';
+import { Module } from './types.js';
+import { getStudentProgress, updateProgress } from './learning.service.js';
 
 const router = Router();
 
@@ -49,8 +50,7 @@ const modules: Module[] = [
   },
 ];
 
-// Mock user progress storage
-const userProgress: Map<string, Progress> = new Map();
+// Prisma handles progress storage now
 
 /**
  * @route   GET /api/learning/modules
@@ -66,14 +66,12 @@ router.get('/modules', (req: Request, res: Response) => {
     if (difficulty) {
       filteredModules = modules.map((mod) => ({
         ...mod,
-        lessons: mod.lessons.filter(
-          (lesson) => lesson.difficulty === difficulty
-        ),
+        lessons: mod.lessons.filter((lesson) => lesson.difficulty === difficulty),
       }));
     }
 
     res.json({ modules: filteredModules });
-  } catch (error) {
+  } catch {
     res.status(500).json({ error: 'Internal server error' });
   }
 });
@@ -94,7 +92,7 @@ router.get('/modules/:moduleId', (req: Request, res: Response) => {
     }
 
     res.json({ module });
-  } catch (error) {
+  } catch {
     res.status(500).json({ error: 'Internal server error' });
   }
 });
@@ -104,26 +102,12 @@ router.get('/modules/:moduleId', (req: Request, res: Response) => {
  * @desc    Get user learning progress
  * @access  Public
  */
-router.get('/progress/:userId', (req: Request, res: Response) => {
+router.get('/progress/:userId', async (req: Request, res: Response) => {
   try {
     const userId = req.params.userId as string;
-    const progress = userProgress.get(userId);
-
-    if (!progress) {
-      // Return default progress if user has no progress yet
-      res.json({
-        progress: {
-          userId,
-          completedLessons: [],
-          currentModule: 'mod-1',
-          percentage: 0,
-        },
-      });
-      return;
-    }
-
+    const progress = await getStudentProgress(userId);
     res.json({ progress });
-  } catch (error) {
+  } catch {
     res.status(500).json({ error: 'Internal server error' });
   }
 });
@@ -133,7 +117,7 @@ router.get('/progress/:userId', (req: Request, res: Response) => {
  * @desc    Mark a lesson as complete
  * @access  Public
  */
-router.post('/progress/:userId/complete', (req: Request, res: Response) => {
+router.post('/progress/:userId/complete', async (req: Request, res: Response) => {
   try {
     const userId = req.params.userId as string;
     const { lessonId } = req.body;
@@ -144,45 +128,22 @@ router.post('/progress/:userId/complete', (req: Request, res: Response) => {
     }
 
     // Verify lesson exists
-    const lessonExists = modules.some((mod) =>
-      mod.lessons.some((l) => l.id === lessonId)
-    );
+    const lessonExists = modules.some((mod) => mod.lessons.some((l) => l.id === lessonId));
 
     if (!lessonExists) {
       res.status(404).json({ error: 'Lesson not found' });
       return;
     }
 
-    // Get or create user progress
-    let progress = userProgress.get(userId);
+    // Find which module this lesson belongs to
+    const parentModule = modules.find((mod) => mod.lessons.some((l) => l.id === lessonId));
+    const moduleId = parentModule?.id ?? 'mod-1';
+    const totalLessons = modules.reduce((acc, mod) => acc + mod.lessons.length, 0);
 
-    if (!progress) {
-      progress = {
-        userId,
-        completedLessons: [],
-        currentModule: 'mod-1',
-        percentage: 0,
-      };
-    }
-
-    // Mark lesson as complete if not already
-    if (!progress.completedLessons.includes(lessonId)) {
-      progress.completedLessons.push(lessonId);
-
-      // Calculate new percentage
-      const totalLessons = modules.reduce(
-        (acc, mod) => acc + mod.lessons.length,
-        0
-      );
-      progress.percentage = Math.round(
-        (progress.completedLessons.length / totalLessons) * 100
-      );
-    }
-
-    userProgress.set(userId, progress);
+    const progress = await updateProgress(userId, lessonId, moduleId, totalLessons);
 
     res.json({ progress, message: 'Lesson marked as complete' });
-  } catch (error) {
+  } catch {
     res.status(500).json({ error: 'Internal server error' });
   }
 });

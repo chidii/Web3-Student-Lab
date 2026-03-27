@@ -26,12 +26,18 @@ project. Ensuring the security of our codebase, user data, and smart contracts i
 
 ### General
 
+<<<<<<< HEAD
 - **Input Validation**: Always validate and sanitize user input to prevent common vulnerabilities
   like XSS and Injection.
 - **Dependency Management**: Regularly update dependencies and use tools like `npm audit` or `snyk`
   to check for known vulnerabilities.
 - **Principle of Least Privilege**: Grant only the minimum necessary permissions to services and
   users.
+=======
+- **Input Validation**: Always validate and sanitize user input to prevent common vulnerabilities like XSS and Injection.
+- **Dependency Management**: Regularly update dependencies and use tools like `npm audit` or `snyk` to check for known vulnerabilities.
+- **Principle of Least Privilege**: Grant only the minimum necessary permissions to services and users.
+>>>>>>> main
 
 ### Smart Contracts
 

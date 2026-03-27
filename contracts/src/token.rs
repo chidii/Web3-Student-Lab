@@ -1,4 +1,6 @@
-use soroban_sdk::{contract, contractimpl, contracttype, panic_with_error, Address, Env};
+use soroban_sdk::{
+    contract, contracterror, contractimpl, contracttype, panic_with_error, Address, Env,
+};
 
 #[contracttype]
 #[derive(Clone)]
@@ -7,8 +9,8 @@ enum DataKey {
     Balance(Address),
 }
 
-#[contracttype]
-#[derive(Clone, Debug, Eq, PartialEq)]
+#[contracterror]
+#[derive(Copy, Clone, Debug, Eq, PartialEq)]
 pub enum TokenError {
     AlreadyInitialized = 1,
     NotAuthorized = 2,
@@ -22,11 +24,7 @@ pub struct RsTokenContract;
 impl RsTokenContract {
     /// Stores the certificate contract address allowed to mint RS-Tokens.
     pub fn init(env: Env, certificate_contract: Address) {
-        if env
-            .storage()
-            .instance()
-            .has(&DataKey::CertificateContract)
-        {
+        if env.storage().instance().has(&DataKey::CertificateContract) {
             panic_with_error!(&env, TokenError::AlreadyInitialized);
         }
 
@@ -79,18 +77,16 @@ mod tests {
         let env = Env::default();
         env.mock_all_auths();
 
+        let contract_id = env.register(RsTokenContract, ());
+        let client = RsTokenContractClient::new(&env, &contract_id);
+
         let certificate_contract = Address::generate(&env);
         let student = Address::generate(&env);
 
-        RsTokenContract::init(env.clone(), certificate_contract.clone());
-        RsTokenContract::mint(
-            env.clone(),
-            certificate_contract,
-            student.clone(),
-            25,
-        );
+        client.init(&certificate_contract);
+        client.mint(&certificate_contract, &student, &25);
 
-        assert_eq!(RsTokenContract::get_balance(env, student), 25);
+        assert_eq!(client.get_balance(&student), 25);
     }
 
     #[test]
@@ -99,11 +95,14 @@ mod tests {
         let env = Env::default();
         env.mock_all_auths();
 
+        let contract_id = env.register(RsTokenContract, ());
+        let client = RsTokenContractClient::new(&env, &contract_id);
+
         let certificate_contract = Address::generate(&env);
         let unauthorized = Address::generate(&env);
         let student = Address::generate(&env);
 
-        RsTokenContract::init(env.clone(), certificate_contract);
-        RsTokenContract::mint(env, unauthorized, student, 10);
+        client.init(&certificate_contract);
+        client.mint(&unauthorized, &student, &10);
     }
 }

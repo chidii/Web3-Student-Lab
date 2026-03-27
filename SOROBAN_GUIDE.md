@@ -217,8 +217,13 @@ Keep these principles in mind as you build:
 - **Explore authorization** — learn how to restrict who can call your functions
 - **Study token contracts** — understand the Stellar Asset Contract (SAC) standard
 - **Build a frontend** — connect your contract to a web app using @stellar/stellar-sdk
+<<<<<<< HEAD
 - **Write tests** — add unit tests using Soroban's built-in test environment Browse examples — study
   real contracts at soroban-examples
+=======
+- **Write tests** — add unit tests using Soroban's built-in test environment
+  Browse examples — study real contracts at soroban-examples
+>>>>>>> main
 
 ## Official Resources
 

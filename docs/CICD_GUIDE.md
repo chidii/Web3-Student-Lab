@@ -15,6 +15,7 @@ The CI pipeline is divided into three parallel jobs: **Backend**, **Frontend**, 
 
 ### 1. Code Push / Pull Request
 
+<<<<<<< HEAD
 When a contributor pushes code or opens a PR, GitHub Actions initiates the workflow defined in
 `.github/workflows/ci.yml`.
 
@@ -22,6 +23,13 @@ When a contributor pushes code or opens a PR, GitHub Actions initiates the workf
 
 For each service (Backend, Frontend, and Contracts), the pipeline performs a build verification
 step:
+=======
+When a contributor pushes code or opens a PR, GitHub Actions initiates the workflow defined in `.github/workflows/ci.yml`.
+
+### 2. Build Verification
+
+For each service (Backend, Frontend, and Contracts), the pipeline performs a build verification step:
+>>>>>>> main
 
 - **Backend**: Runs `npm run build` to ensure TypeScript compilation passes.
 - **Frontend**: Runs `npm run build` (Next.js build) to verify the application can be bundled
@@ -34,6 +42,7 @@ The pipeline runs the following automated checks to maintain code quality:
 
 #### Backend
 
+<<<<<<< HEAD
 - **Unit Tests**: Executes `npm test` using **Jest**. This verifies the core business logic, API
   endpoints, and utility functions.
 - **Service Verification**: Ensures that the backend can connect to a mock database and that the API
@@ -43,12 +52,24 @@ The pipeline runs the following automated checks to maintain code quality:
 
 - **Linting**: Runs `npm run lint` using **ESLint** to enforce consistent coding styles and catch
   common errors.
+=======
+- **Unit Tests**: Executes `npm test` using **Jest**. This verifies the core business logic, API endpoints, and utility functions.
+- **Service Verification**: Ensures that the backend can connect to a mock database and that the API schema is consistent.
+
+#### Frontend
+
+- **Linting**: Runs `npm run lint` using **ESLint** to enforce consistent coding styles and catch common errors.
+>>>>>>> main
 - **Static Analysis**: Next.js build verification includes a type-checking phase for TypeScript.
 
 #### Contracts
 
+<<<<<<< HEAD
 - **Compilation**: Verifies that the Rust smart contracts compile successfully for the
   `wasm32-unknown-unknown` target.
+=======
+- **Compilation**: Verifies that the Rust smart contracts compile successfully for the `wasm32-unknown-unknown` target.
+>>>>>>> main
 
 ## Deployment Pipeline (CD)
 
@@ -56,10 +77,15 @@ _Note: Deployment pipelines are currently under development._
 
 The planned flow for CD is as follows:
 
+<<<<<<< HEAD
 - **Staging**: Merges to `main` trigger an automatic deployment to a staging environment (e.g.,
   Render or Vercel).
 - **Production**: Tagged releases are deployed to the production environment after final manual
   verification.
+=======
+- **Staging**: Merges to `main` trigger an automatic deployment to a staging environment (e.g., Render or Vercel).
+- **Production**: Tagged releases are deployed to the production environment after final manual verification.
+>>>>>>> main
 
 ---
 

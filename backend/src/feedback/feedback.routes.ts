@@ -34,7 +34,7 @@ router.post('/', authenticate, async (req: Request, res: Response) => {
       review: review || undefined,
     });
     res.status(201).json(feedback);
-  } catch (error) {
+  } catch {
     if (error instanceof Error) {
       if (error.message === 'Course not found') {
         res.status(404).json({ error: error.message });
@@ -66,10 +66,14 @@ router.post('/', authenticate, async (req: Request, res: Response) => {
  */
 router.get('/course/:courseId', async (req: Request, res: Response) => {
   try {
-    const { courseId } = req.params;
+    const { courseId } = req.params as { courseId: string };
+    if (!courseId) {
+      res.status(400).json({ error: 'Course ID is required' });
+      return;
+    }
     const feedback = await getFeedbackByCourse(courseId);
     res.json(feedback);
-  } catch (error) {
+  } catch {
     if (error instanceof Error && error.message === 'Course not found') {
       res.status(404).json({ error: error.message });
       return;
@@ -85,10 +89,14 @@ router.get('/course/:courseId', async (req: Request, res: Response) => {
  */
 router.get('/course/:courseId/summary', async (req: Request, res: Response) => {
   try {
-    const { courseId } = req.params;
+    const { courseId } = req.params as { courseId: string };
+    if (!courseId) {
+      res.status(400).json({ error: 'Course ID is required' });
+      return;
+    }
     const summary = await getCourseRatingSummary(courseId);
     res.json(summary);
-  } catch (error) {
+  } catch {
     if (error instanceof Error && error.message === 'Course not found') {
       res.status(404).json({ error: error.message });
       return;
@@ -102,6 +110,7 @@ router.get('/course/:courseId/summary', async (req: Request, res: Response) => {
  * @desc    Get current user's feedback for a specific course
  * @access  Private (requires authentication)
  */
+<<<<<<< HEAD
 router.get(
   '/my-feedback/:courseId',
   authenticate,
@@ -111,6 +120,17 @@ router.get(
       const { courseId } = req.params;
 
       const feedback = await getFeedbackByStudentAndCourse(studentId, courseId);
+=======
+router.get('/my-feedback/:courseId', authenticate, async (req: Request, res: Response) => {
+  try {
+    const studentId = req.user!.id;
+    const { courseId } = req.params as { courseId: string };
+    if (!courseId) {
+      res.status(400).json({ error: 'Course ID is required' });
+      return;
+    }
+    const feedback = await getFeedbackByStudentAndCourse(studentId, courseId);
+>>>>>>> main
 
       if (!feedback) {
         res.status(404).json({ error: 'Feedback not found' });
@@ -121,6 +141,13 @@ router.get(
     } catch (error) {
       res.status(500).json({ error: 'Failed to fetch feedback' });
     }
+<<<<<<< HEAD
+=======
+
+    res.json(feedback);
+  } catch {
+    res.status(500).json({ error: 'Failed to fetch feedback' });
+>>>>>>> main
   }
 );
 
@@ -132,7 +159,11 @@ router.get(
 router.put('/:courseId', authenticate, async (req: Request, res: Response) => {
   try {
     const studentId = req.user!.id;
-    const { courseId } = req.params;
+    const { courseId } = req.params as { courseId: string };
+    if (!courseId) {
+      res.status(400).json({ error: 'Course ID is required' });
+      return;
+    }
     const { rating, review }: UpdateFeedbackRequest = req.body;
 
     // Validation
@@ -146,7 +177,7 @@ router.put('/:courseId', authenticate, async (req: Request, res: Response) => {
       review: review || undefined,
     });
     res.json(feedback);
-  } catch (error) {
+  } catch {
     if (error instanceof Error) {
       if (error.message === 'Feedback not found') {
         res.status(404).json({ error: error.message });
@@ -169,6 +200,7 @@ router.put('/:courseId', authenticate, async (req: Request, res: Response) => {
  * @desc    Delete feedback for a course
  * @access  Private (requires authentication)
  */
+<<<<<<< HEAD
 router.delete(
   '/:courseId',
   authenticate,
@@ -185,6 +217,22 @@ router.delete(
         return;
       }
       res.status(500).json({ error: 'Failed to delete feedback' });
+=======
+router.delete('/:courseId', authenticate, async (req: Request, res: Response) => {
+  try {
+    const studentId = req.user!.id;
+    const { courseId } = req.params as { courseId: string };
+    if (!courseId) {
+      res.status(400).json({ error: 'Course ID is required' });
+      return;
+    }
+    await deleteFeedback(studentId, courseId);
+    res.status(204).send();
+  } catch {
+    if (error instanceof Error && error.message === 'Feedback not found') {
+      res.status(404).json({ error: error.message });
+      return;
+>>>>>>> main
     }
   }
 );

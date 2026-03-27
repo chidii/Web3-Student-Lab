@@ -1,7 +1,11 @@
 ## Description
 
+<<<<<<< HEAD
 Please provide a brief description of the changes in this pull request. Explain what the PR
 accomplishes and why it is needed.
+=======
+Please provide a brief description of the changes in this pull request. Explain what the PR accomplishes and why it is needed.
+>>>>>>> main
 
 ## Reference Issues
 

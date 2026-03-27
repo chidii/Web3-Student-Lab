@@ -4,9 +4,7 @@ import { app } from '../src/index';
 describe('Learning Module Integration Tests', () => {
   describe('GET /api/learning/modules', () => {
     it('should return all modules', async () => {
-      const response = await request(app)
-        .get('/api/learning/modules')
-        .expect(200);
+      const response = await request(app).get('/api/learning/modules').expect(200);
 
       expect(response.body).toHaveProperty('modules');
       expect(Array.isArray(response.body.modules)).toBe(true);
@@ -21,17 +19,17 @@ describe('Learning Module Integration Tests', () => {
       expect(response.body).toHaveProperty('modules');
 
       // Check that all returned lessons are beginner level
-      response.body.modules.forEach((module: any) => {
-        module.lessons.forEach((lesson: any) => {
-          expect(lesson.difficulty).toBe('beginner');
-        });
-      });
+      response.body.modules.forEach(
+        (module: Record<string, unknown> & { lessons: Record<string, unknown>[] }) => {
+          module.lessons.forEach((lesson: Record<string, unknown>) => {
+            expect(lesson.difficulty).toBe('beginner');
+          });
+        }
+      );
     });
 
     it('should return modules with correct structure', async () => {
-      const response = await request(app)
-        .get('/api/learning/modules')
-        .expect(200);
+      const response = await request(app).get('/api/learning/modules').expect(200);
 
       const firstModule = response.body.modules[0];
       expect(firstModule).toHaveProperty('id');
@@ -44,9 +42,7 @@ describe('Learning Module Integration Tests', () => {
 
   describe('GET /api/learning/modules/:moduleId', () => {
     it('should return a specific module by ID', async () => {
-      const response = await request(app)
-        .get('/api/learning/modules/mod-1')
-        .expect(200);
+      const response = await request(app).get('/api/learning/modules/mod-1').expect(200);
 
       expect(response.body).toHaveProperty('module');
       expect(response.body.module.id).toBe('mod-1');
@@ -55,9 +51,7 @@ describe('Learning Module Integration Tests', () => {
     });
 
     it('should return 404 for non-existent module', async () => {
-      const response = await request(app)
-        .get('/api/learning/modules/non-existent-id')
-        .expect(404);
+      const response = await request(app).get('/api/learning/modules/non-existent-id').expect(404);
 
       expect(response.body).toHaveProperty('error');
     });
@@ -65,9 +59,7 @@ describe('Learning Module Integration Tests', () => {
 
   describe('GET /api/learning/progress/:userId', () => {
     it('should return default progress for new user', async () => {
-      const response = await request(app)
-        .get('/api/learning/progress/new-user-123')
-        .expect(200);
+      const response = await request(app).get('/api/learning/progress/new-user-123').expect(200);
 
       expect(response.body).toHaveProperty('progress');
       expect(response.body.progress.userId).toBe('new-user-123');
@@ -81,9 +73,7 @@ describe('Learning Module Integration Tests', () => {
         .post('/api/learning/progress/existing-user/complete')
         .send({ lessonId: 'lesson-1' });
 
-      const response = await request(app)
-        .get('/api/learning/progress/existing-user')
-        .expect(200);
+      const response = await request(app).get('/api/learning/progress/existing-user').expect(200);
 
       expect(response.body).toHaveProperty('progress');
       expect(response.body.progress.userId).toBe('existing-user');
@@ -146,9 +136,7 @@ describe('Learning Module Integration Tests', () => {
       const lessonId = 'lesson-1';
 
       // Complete lesson twice
-      await request(app)
-        .post(`/api/learning/progress/${userId}/complete`)
-        .send({ lessonId });
+      await request(app).post(`/api/learning/progress/${userId}/complete`).send({ lessonId });
 
       const response = await request(app)
         .post(`/api/learning/progress/${userId}/complete`)

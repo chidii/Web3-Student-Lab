@@ -10,6 +10,12 @@ assignees: ''
 
 **To Reproduce** Steps to reproduce the behavior:
 
+<<<<<<< HEAD
+=======
+**To Reproduce**
+Steps to reproduce the behavior:
+
+>>>>>>> main
 1. Go to '...'
 2. Click on '....'
 3. Scroll down to '....'

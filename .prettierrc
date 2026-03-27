@@ -1,5 +1,6 @@
 {
   "semi": true,
+<<<<<<< HEAD
   "trailingComma": "es5",
   "singleQuote": true,
   "printWidth": 80,
@@ -46,4 +47,10 @@
       }
     }
   ]
+=======
+  "singleQuote": true,
+  "tabWidth": 2,
+  "trailingComma": "es5",
+  "printWidth": 100
+>>>>>>> main
 }

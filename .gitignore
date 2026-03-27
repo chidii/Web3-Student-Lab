@@ -30,3 +30,15 @@ yarn-error.log*
 .vercel
 target
 Cargo.lock
+
+# build artifacts
+dist/
+backend/dist/
+*.js
+*.js.map
+*.d.ts
+!jest.config.js
+!next.config.ts
+!postcss.config.mjs
+!eslint.config.mjs
+

@@ -23,10 +23,7 @@ describe('Auth Module Integration Tests', () => {
         lastName: 'User',
       };
 
-      const response = await request(app)
-        .post('/api/auth/register')
-        .send(newStudent)
-        .expect(201);
+      const response = await request(app).post('/api/auth/register').send(newStudent).expect(201);
 
       expect(response.body).toHaveProperty('user');
       expect(response.body.user).toHaveProperty('id');
@@ -61,10 +58,7 @@ describe('Auth Module Integration Tests', () => {
         lastName: 'User',
       };
 
-      const response = await request(app)
-        .post('/api/auth/register')
-        .send(newStudent)
-        .expect(400);
+      const response = await request(app).post('/api/auth/register').send(newStudent).expect(400);
 
       expect(response.body).toHaveProperty('error');
     });
@@ -84,10 +78,7 @@ describe('Auth Module Integration Tests', () => {
         .expect(201);
 
       // Second registration with same email
-      const response = await request(app)
-        .post('/api/auth/register')
-        .send(newStudent)
-        .expect(409);
+      const response = await request(app).post('/api/auth/register').send(newStudent).expect(409);
 
       expect(response.body).toHaveProperty('error');
       expect(response.body.error).toBe(
@@ -175,9 +166,7 @@ describe('Auth Module Integration Tests', () => {
 
     beforeEach(async () => {
       // Register and login to get a valid token
-      const registerResponse = await request(app)
-        .post('/api/auth/register')
-        .send(testStudent);
+      const registerResponse = await request(app).post('/api/auth/register').send(testStudent);
       authToken = registerResponse.body.token;
     });
 

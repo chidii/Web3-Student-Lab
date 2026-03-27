@@ -128,9 +128,7 @@ export const createFeedback = async (
 /**
  * Get all feedback for a specific course
  */
-export const getFeedbackByCourse = async (
-  courseId: string
-): Promise<FeedbackResponse[]> => {
+export const getFeedbackByCourse = async (courseId: string): Promise<FeedbackResponse[]> => {
   // Check if course exists
   const course = await prisma.course.findUnique({
     where: { id: courseId },
@@ -256,10 +254,7 @@ export const updateFeedback = async (
 /**
  * Delete feedback
  */
-export const deleteFeedback = async (
-  studentId: string,
-  courseId: string
-): Promise<void> => {
+export const deleteFeedback = async (studentId: string, courseId: string): Promise<void> => {
   // Check if feedback exists
   const existingFeedback = await prisma.feedback.findUnique({
     where: {
@@ -287,9 +282,7 @@ export const deleteFeedback = async (
 /**
  * Get rating summary for a course
  */
-export const getCourseRatingSummary = async (
-  courseId: string
-): Promise<CourseRatingSummary> => {
+export const getCourseRatingSummary = async (courseId: string): Promise<CourseRatingSummary> => {
   // Check if course exists
   const course = await prisma.course.findUnique({
     where: { id: courseId },

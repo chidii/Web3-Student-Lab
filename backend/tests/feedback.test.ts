@@ -133,9 +133,7 @@ describe('Feedback Module Integration Tests', () => {
     });
 
     it('should fetch all feedback for a course', async () => {
-      const response = await request(app)
-        .get(`/api/feedback/course/${courseId}`)
-        .expect(200);
+      const response = await request(app).get(`/api/feedback/course/${courseId}`).expect(200);
 
       expect(Array.isArray(response.body)).toBe(true);
       expect(response.body.length).toBe(1);
@@ -144,9 +142,7 @@ describe('Feedback Module Integration Tests', () => {
     });
 
     it('should return 404 for non-existent course', async () => {
-      const response = await request(app)
-        .get('/api/feedback/course/non-existent-id')
-        .expect(404);
+      const response = await request(app).get('/api/feedback/course/non-existent-id').expect(404);
 
       expect(response.body).toHaveProperty('error');
     });
