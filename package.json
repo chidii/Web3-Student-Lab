@@ -28,7 +28,7 @@
       "prettier --write"
     ],
     "contracts/**/*.rs": [
-      "cargo clippy --manifest-path contracts/Cargo.toml -- -D warnings --"
+      "bash -lc \"cargo clippy --manifest-path contracts/Cargo.toml -- -D warnings\""
     ]
   },
   "dependencies": {
