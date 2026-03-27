@@ -2,16 +2,24 @@
 
 pub mod token;
 
-use soroban_sdk::{contract, contractimpl, contracttype, Address, Env, String, Symbol};
+use soroban_sdk::{contract, contractimpl, contracttype, Address, Env, String, Symbol, Vec};
 
 #[contracttype]
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct Certificate {
-    pub symbol: Symbol,
-    pub student: String,
+    pub course_symbol: Symbol,
+    pub student: Address,
     pub course_name: String,
     pub issue_date: u64,
     pub revoked: bool,
+}
+
+/// Composite storage key: one entry per (course, student) pair.
+#[contracttype]
+#[derive(Clone)]
+pub struct CertKey {
+    pub course_symbol: Symbol,
+    pub student: Address,
 }
 
 const ADMIN_KEY: &str = "admin";
@@ -32,30 +40,48 @@ impl CertificateContract {
             .set(&Symbol::new(&env, ADMIN_KEY), &admin);
     }
 
-    /// Issue a new certificate to a student for a specific course.
-    pub fn issue(env: Env, symbol: Symbol, student: String, course_name: String) -> Certificate {
+    /// Issue certificates to one or more students for a course in a single transaction.
+    /// Each student gets a unique certificate stored under (course_symbol, student) key.
+    /// A `cert_issued` event is emitted for every certificate.
+    pub fn issue(
+        env: Env,
+        course_symbol: Symbol,
+        students: Vec<Address>,
+        course_name: String,
+    ) -> Vec<Certificate> {
         let issue_date = env.ledger().timestamp();
+        let mut issued: Vec<Certificate> = Vec::new(&env);
 
-        let cert = Certificate {
-            symbol: symbol.clone(),
-            student: student.clone(),
-            course_name: course_name.clone(),
-            issue_date,
-            revoked: false,
-        };
+        for student in students.iter() {
+            let key = CertKey {
+                course_symbol: course_symbol.clone(),
+                student: student.clone(),
+            };
 
-        env.storage().instance().set(&symbol, &cert);
+            let cert = Certificate {
+                course_symbol: course_symbol.clone(),
+                student: student.clone(),
+                course_name: course_name.clone(),
+                issue_date,
+                revoked: false,
+            };
 
-        env.events().publish(
-            (Symbol::new(&env, "cert_issued"), symbol),
-            (student, course_name),
-        );
+            env.storage().instance().set(&key, &cert);
 
-        cert
+            env.events().publish(
+                (Symbol::new(&env, "cert_issued"), course_symbol.clone()),
+                (student.clone(), course_name.clone()),
+            );
+
+            issued.push_back(cert);
+        }
+
+        issued
     }
 
-    /// Revoke a certificate by its symbol. Only callable by the administrator.
-    pub fn revoke(env: Env, caller: Address, symbol: Symbol) {
+    /// Revoke a certificate by course symbol and student address.
+    /// Only callable by the administrator.
+    pub fn revoke(env: Env, caller: Address, course_symbol: Symbol, student: Address) {
         caller.require_auth();
 
         let admin: Address = env
@@ -68,24 +94,37 @@ impl CertificateContract {
             panic!("unauthorized: only the admin can revoke certificates");
         }
 
+        let key = CertKey {
+            course_symbol: course_symbol.clone(),
+            student: student.clone(),
+        };
+
         let mut cert: Certificate = env
             .storage()
             .instance()
-            .get(&symbol)
+            .get(&key)
             .expect("certificate not found");
 
         cert.revoked = true;
-        env.storage().instance().set(&symbol, &cert);
+        env.storage().instance().set(&key, &cert);
 
         env.events().publish(
-            (Symbol::new(&env, "cert_revoked"), symbol),
-            caller,
+            (Symbol::new(&env, "cert_revoked"), course_symbol),
+            (caller, student),
         );
     }
 
-    /// Retrieve a certificate by its symbol.
-    pub fn get_certificate(env: Env, symbol: Symbol) -> Option<Certificate> {
-        env.storage().instance().get(&symbol)
+    /// Retrieve a certificate by course symbol and student address.
+    pub fn get_certificate(
+        env: Env,
+        course_symbol: Symbol,
+        student: Address,
+    ) -> Option<Certificate> {
+        let key = CertKey {
+            course_symbol,
+            student,
+        };
+        env.storage().instance().get(&key)
     }
 }
 
