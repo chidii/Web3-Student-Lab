@@ -2,30 +2,13 @@
 // npm install --save-dev prisma dotenv
 import 'dotenv/config';
 import { defineConfig } from 'prisma/config';
-<<<<<<< HEAD
-import { PrismaPg } from '@prisma/adapter-pg';
-import pg from 'pg';
-=======
->>>>>>> main
 
 const connectionString =
   process.env.DATABASE_URL ||
   'postgresql://postgres:postgres@localhost:5432/web3-student-lab?schema=public';
-<<<<<<< HEAD
-
-const pool = new pg.Pool({ connectionString });
-const adapter = new PrismaPg(pool);
 
 export default defineConfig({
   schema: 'prisma/schema.prisma',
-  migrations: {
-    path: 'prisma/migrations',
-  },
-=======
-
-export default defineConfig({
-  schema: 'prisma/schema.prisma',
->>>>>>> main
   datasource: {
     url: connectionString,
   },

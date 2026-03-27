@@ -1,56 +1,11 @@
 import { Router, Request, Response } from 'express';
-import { Module } from './types.js';
-import { getStudentProgress, updateProgress } from './learning.service.js';
+import { getStudentProgress, updateStudentProgress } from './learning.service.js';
+import { curriculumByCourseId } from './curriculum.data.js';
 
 const router = Router();
 
-// Mock data
-const modules: Module[] = [
-  {
-    id: 'mod-1',
-    title: 'Blockchain Fundamentals',
-    description: 'Learn the basics of blockchain technology',
-    lessons: [
-      {
-        id: 'lesson-1',
-        title: 'What is Blockchain?',
-        description: 'Introduction to distributed ledger technology',
-        difficulty: 'beginner',
-        completed: false,
-      },
-      {
-        id: 'lesson-2',
-        title: 'How Transactions Work',
-        description: 'Understanding transaction flow in blockchain',
-        difficulty: 'beginner',
-        completed: false,
-      },
-    ],
-  },
-  {
-    id: 'mod-2',
-    title: 'Smart Contracts',
-    description: 'Introduction to smart contracts and Soroban',
-    lessons: [
-      {
-        id: 'lesson-3',
-        title: 'Smart Contract Basics',
-        description: 'What are smart contracts and how they work',
-        difficulty: 'intermediate',
-        completed: false,
-      },
-      {
-        id: 'lesson-4',
-        title: 'Writing Soroban Contracts',
-        description: 'Learn to write smart contracts in Rust',
-        difficulty: 'intermediate',
-        completed: false,
-      },
-    ],
-  },
-];
-
-// Prisma handles progress storage now
+// Use Course 1 as the default for the modules list
+const modules = curriculumByCourseId['course-1'] || [];
 
 /**
  * @route   GET /api/learning/modules
@@ -71,7 +26,7 @@ router.get('/modules', (req: Request, res: Response) => {
     }
 
     res.json({ modules: filteredModules });
-  } catch {
+  } catch (error) {
     res.status(500).json({ error: 'Internal server error' });
   }
 });
@@ -92,7 +47,7 @@ router.get('/modules/:moduleId', (req: Request, res: Response) => {
     }
 
     res.json({ module });
-  } catch {
+  } catch (error) {
     res.status(500).json({ error: 'Internal server error' });
   }
 });
@@ -107,7 +62,7 @@ router.get('/progress/:userId', async (req: Request, res: Response) => {
     const userId = req.params.userId as string;
     const progress = await getStudentProgress(userId);
     res.json({ progress });
-  } catch {
+  } catch (error) {
     res.status(500).json({ error: 'Internal server error' });
   }
 });
@@ -127,7 +82,7 @@ router.post('/progress/:userId/complete', async (req: Request, res: Response) =>
       return;
     }
 
-    // Verify lesson exists
+    // Verify lesson exists in any module
     const lessonExists = modules.some((mod) => mod.lessons.some((l) => l.id === lessonId));
 
     if (!lessonExists) {
@@ -135,15 +90,10 @@ router.post('/progress/:userId/complete', async (req: Request, res: Response) =>
       return;
     }
 
-    // Find which module this lesson belongs to
-    const parentModule = modules.find((mod) => mod.lessons.some((l) => l.id === lessonId));
-    const moduleId = parentModule?.id ?? 'mod-1';
-    const totalLessons = modules.reduce((acc, mod) => acc + mod.lessons.length, 0);
-
-    const progress = await updateProgress(userId, lessonId, moduleId, totalLessons);
+    const progress = await updateStudentProgress(userId, lessonId);
 
     res.json({ progress, message: 'Lesson marked as complete' });
-  } catch {
+  } catch (error) {
     res.status(500).json({ error: 'Internal server error' });
   }
 });

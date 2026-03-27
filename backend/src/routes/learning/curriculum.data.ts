@@ -144,3 +144,27 @@ export const curriculumByCourseId: Record<string, Module[]> = {
 export const getCurriculumForCourse = (courseId: string): Module[] => {
   return curriculumByCourseId[courseId] ?? [];
 };
+
+export const COURSES = [
+  {
+    id: 'course-1',
+    title: 'Soroban Smart Contracts',
+    description: 'Master the art of writing and deploying smart contracts on Stellar.',
+    level: 'intermediate',
+    duration: '4 weeks',
+  },
+  {
+    id: 'course-2',
+    title: 'Stellar Fundamentals',
+    description: 'Learn the core concepts of the Stellar network and its ecosystem.',
+    level: 'beginner',
+    duration: '2 weeks',
+  },
+  {
+    id: 'course-3',
+    title: 'Full-Stack Web3',
+    description: 'Build end-to-end decentralized applications using modern tools.',
+    level: 'advanced',
+    duration: '6 weeks',
+  },
+];

@@ -26,11 +26,8 @@
     "babel-plugin-react-compiler": "1.0.0",
     "eslint": "^9",
     "eslint-config-next": "16.1.6",
-<<<<<<< HEAD
     "prettier-plugin-tailwindcss": "^0.7.2",
-=======
     "prettier": "^3.8.1",
->>>>>>> main
     "tailwindcss": "^4",
     "typescript": "^5"
   }

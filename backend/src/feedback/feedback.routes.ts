@@ -34,23 +34,17 @@ router.post('/', authenticate, async (req: Request, res: Response) => {
       review: review || undefined,
     });
     res.status(201).json(feedback);
-  } catch {
+  } catch (error: any) {
     if (error instanceof Error) {
       if (error.message === 'Course not found') {
         res.status(404).json({ error: error.message });
         return;
       }
-      if (
-        error.message ===
-        'Student must be enrolled in the course to submit feedback'
-      ) {
+      if (error.message === 'Student must be enrolled in the course to submit feedback') {
         res.status(403).json({ error: error.message });
         return;
       }
-      if (
-        error.message.includes('Rating must be') ||
-        error.message.includes('Review must be')
-      ) {
+      if (error.message.includes('Rating must be') || error.message.includes('Review must be')) {
         res.status(400).json({ error: error.message });
         return;
       }
@@ -73,7 +67,7 @@ router.get('/course/:courseId', async (req: Request, res: Response) => {
     }
     const feedback = await getFeedbackByCourse(courseId);
     res.json(feedback);
-  } catch {
+  } catch (error: any) {
     if (error instanceof Error && error.message === 'Course not found') {
       res.status(404).json({ error: error.message });
       return;
@@ -96,7 +90,7 @@ router.get('/course/:courseId/summary', async (req: Request, res: Response) => {
     }
     const summary = await getCourseRatingSummary(courseId);
     res.json(summary);
-  } catch {
+  } catch (error: any) {
     if (error instanceof Error && error.message === 'Course not found') {
       res.status(404).json({ error: error.message });
       return;
@@ -110,17 +104,6 @@ router.get('/course/:courseId/summary', async (req: Request, res: Response) => {
  * @desc    Get current user's feedback for a specific course
  * @access  Private (requires authentication)
  */
-<<<<<<< HEAD
-router.get(
-  '/my-feedback/:courseId',
-  authenticate,
-  async (req: Request, res: Response) => {
-    try {
-      const studentId = req.user!.id;
-      const { courseId } = req.params;
-
-      const feedback = await getFeedbackByStudentAndCourse(studentId, courseId);
-=======
 router.get('/my-feedback/:courseId', authenticate, async (req: Request, res: Response) => {
   try {
     const studentId = req.user!.id;
@@ -130,26 +113,17 @@ router.get('/my-feedback/:courseId', authenticate, async (req: Request, res: Res
       return;
     }
     const feedback = await getFeedbackByStudentAndCourse(studentId, courseId);
->>>>>>> main
 
-      if (!feedback) {
-        res.status(404).json({ error: 'Feedback not found' });
-        return;
-      }
-
-      res.json(feedback);
-    } catch (error) {
-      res.status(500).json({ error: 'Failed to fetch feedback' });
+    if (!feedback) {
+      res.status(404).json({ error: 'Feedback not found' });
+      return;
     }
-<<<<<<< HEAD
-=======
 
     res.json(feedback);
-  } catch {
+  } catch (error: any) {
     res.status(500).json({ error: 'Failed to fetch feedback' });
->>>>>>> main
   }
-);
+});
 
 /**
  * @route   PUT /api/feedback/:courseId
@@ -177,16 +151,13 @@ router.put('/:courseId', authenticate, async (req: Request, res: Response) => {
       review: review || undefined,
     });
     res.json(feedback);
-  } catch {
+  } catch (error: any) {
     if (error instanceof Error) {
       if (error.message === 'Feedback not found') {
         res.status(404).json({ error: error.message });
         return;
       }
-      if (
-        error.message.includes('Rating must be') ||
-        error.message.includes('Review must be')
-      ) {
+      if (error.message.includes('Rating must be') || error.message.includes('Review must be')) {
         res.status(400).json({ error: error.message });
         return;
       }
@@ -200,24 +171,6 @@ router.put('/:courseId', authenticate, async (req: Request, res: Response) => {
  * @desc    Delete feedback for a course
  * @access  Private (requires authentication)
  */
-<<<<<<< HEAD
-router.delete(
-  '/:courseId',
-  authenticate,
-  async (req: Request, res: Response) => {
-    try {
-      const studentId = req.user!.id;
-      const { courseId } = req.params;
-
-      await deleteFeedback(studentId, courseId);
-      res.status(204).send();
-    } catch (error) {
-      if (error instanceof Error && error.message === 'Feedback not found') {
-        res.status(404).json({ error: error.message });
-        return;
-      }
-      res.status(500).json({ error: 'Failed to delete feedback' });
-=======
 router.delete('/:courseId', authenticate, async (req: Request, res: Response) => {
   try {
     const studentId = req.user!.id;
@@ -228,13 +181,13 @@ router.delete('/:courseId', authenticate, async (req: Request, res: Response) =>
     }
     await deleteFeedback(studentId, courseId);
     res.status(204).send();
-  } catch {
+  } catch (error: any) {
     if (error instanceof Error && error.message === 'Feedback not found') {
       res.status(404).json({ error: error.message });
       return;
->>>>>>> main
     }
+    res.status(500).json({ error: 'Failed to delete feedback' });
   }
-);
+});
 
 export default router;

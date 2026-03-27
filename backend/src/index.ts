@@ -1,20 +1,12 @@
 import express, { Request, Response } from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
-<<<<<<< HEAD
-import express, { Request, Response } from 'express';
 import { rateLimit } from 'express-rate-limit';
 import prisma from './db/index.js';
 import { requestLogger } from './middleware/requestLogger.js';
 import routes from './routes/index.js';
 import { validateEnvironment } from './utils/checkEnv.js';
 import logger from './utils/logger.js';
-=======
-import { validateEnvironment } from './utils/checkEnv';
-import { requestLogger } from './middleware/requestLogger';
-import routes from './routes/index';
-import prisma from './db/index';
->>>>>>> 92adf5c (Course Curriculum and Student Progress API)
 
 // Load environment variables
 dotenv.config();
