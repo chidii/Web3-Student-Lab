@@ -48,11 +48,7 @@ pub struct PaymentGatewayContract;
 impl PaymentGatewayContract {
     /// One-time initialisation: set the SAC address, treasury, and cert price.
     pub fn init(env: Env, asset_contract: Address, treasury: Address, cert_price: i128) {
-        if env
-            .storage()
-            .instance()
-            .has(&GatewayKey::AssetContract)
-        {
+        if env.storage().instance().has(&GatewayKey::AssetContract) {
             panic_with_error!(&env, GatewayError::AlreadyInitialized);
         }
 
@@ -83,11 +79,7 @@ impl PaymentGatewayContract {
             .get(&GatewayKey::AssetContract)
             .unwrap_or_else(|| panic_with_error!(&env, GatewayError::NotInitialized));
 
-        let treasury: Address = env
-            .storage()
-            .instance()
-            .get(&GatewayKey::Treasury)
-            .unwrap();
+        let treasury: Address = env.storage().instance().get(&GatewayKey::Treasury).unwrap();
 
         let cert_price: i128 = env
             .storage()

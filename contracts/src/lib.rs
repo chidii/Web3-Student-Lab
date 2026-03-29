@@ -185,12 +185,7 @@ impl CertificateContract {
 
     fn governance_admin_index(env: &Env, addr: &Address) -> Option<u32> {
         let admins = Self::governance_admins(env);
-        for i in 0..admins.len() {
-            if admins.get(i).unwrap() == *addr {
-                return Some(i as u32);
-            }
-        }
-        None
+        (0..admins.len()).find(|&i| admins.get(i).unwrap() == *addr)
     }
 
     fn require_governance_admin(env: &Env, caller: &Address) {
@@ -468,11 +463,11 @@ impl CertificateContract {
 
         let student_count = students.len();
         let available = Self::check_and_update_mint_tracking(&env);
-        if (student_count as u32) > available {
+        if student_count > available {
             panic_with_error!(&env, CertError::MintCapExceeded);
         }
 
-        Self::record_mint(&env, student_count as u32);
+        Self::record_mint(&env, student_count);
 
         let issue_date = env.ledger().timestamp();
         let mut issued: Vec<Certificate> = Vec::new(&env);
@@ -503,10 +498,7 @@ impl CertificateContract {
 
         env.events().publish(
             (Symbol::new(&env, "mint_period_update"),),
-            (
-                env.ledger().sequence() / LEDGERS_PER_PERIOD,
-                student_count as u32,
-            ),
+            (env.ledger().sequence() / LEDGERS_PER_PERIOD, student_count),
         );
 
         issued

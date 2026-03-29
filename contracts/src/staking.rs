@@ -73,7 +73,9 @@ impl StakingContract {
             panic_with_error!(&env, StakingError::InsufficientStake);
         }
 
-        env.storage().instance().set(&stake_key, &(current - amount));
+        env.storage()
+            .instance()
+            .set(&stake_key, &(current - amount));
     }
 
     /// Cast `vote_weight` tokens toward `proposal_id`.
@@ -82,11 +84,7 @@ impl StakingContract {
         voter.require_auth();
 
         let active_key = StakingKey::ProposalActive(proposal_id);
-        let is_active: bool = env
-            .storage()
-            .instance()
-            .get(&active_key)
-            .unwrap_or(false);
+        let is_active: bool = env.storage().instance().get(&active_key).unwrap_or(false);
 
         if !is_active {
             panic_with_error!(&env, StakingError::ProposalNotActive);
