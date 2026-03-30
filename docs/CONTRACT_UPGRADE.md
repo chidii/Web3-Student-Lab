@@ -2,19 +2,19 @@
 
 ## How It Works
 
-The `upgrade(caller, new_wasm_hash)` function replaces the contract's executable WASM
-using Soroban's built-in `update_current_contract_wasm`. Instance storage (certificates,
-nonces, admin key) is **preserved** across upgrades — only the code changes.
+The `upgrade(caller, new_wasm_hash)` function replaces the contract's executable WASM using
+Soroban's built-in `update_current_contract_wasm`. Instance storage (certificates, nonces, admin
+key) is **preserved** across upgrades — only the code changes.
 
 ## Security Considerations
 
-| Risk | Mitigation |
-|---|---|
-| Admin key compromise | Attacker can deploy arbitrary code. Use a multisig or hardware wallet for the admin address in production. |
-| Unaudited WASM | New code is not validated on-chain. Always audit and test the new WASM before uploading its hash. |
-| No timelock | Upgrades take effect immediately. Consider a timelock contract that delays execution to give users time to exit. |
+| Risk                  | Mitigation                                                                                                                        |
+| --------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| Admin key compromise  | Attacker can deploy arbitrary code. Use a multisig or hardware wallet for the admin address in production.                        |
+| Unaudited WASM        | New code is not validated on-chain. Always audit and test the new WASM before uploading its hash.                                 |
+| No timelock           | Upgrades take effect immediately. Consider a timelock contract that delays execution to give users time to exit.                  |
 | State incompatibility | If the new contract reads storage keys differently, existing data may be misread. Plan and test state migration before upgrading. |
-| Irreversibility | Once upgraded, the old code is gone. Keep the old WASM hash and a rollback plan ready. |
+| Irreversibility       | Once upgraded, the old code is gone. Keep the old WASM hash and a rollback plan ready.                                            |
 
 ## Upgrade Checklist
 

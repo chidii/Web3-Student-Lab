@@ -1,12 +1,16 @@
 # PR Preview Site Configuration
 
-This document compares automated preview deployment options for every Pull Request in the **Web3-Student-Lab** project and recommends the best approach for a student environment.
+This document compares automated preview deployment options for every Pull Request in the
+**Web3-Student-Lab** project and recommends the best approach for a student environment.
 
 ---
 
 ## Why PR Previews Matter
 
-Pull Request preview deployments give every contributor a live, shareable URL for their branch — no local setup required. Reviewers can test UI changes, check responsiveness, and catch regressions before merging. For a student project, this dramatically lowers the feedback loop and makes code review more visual and accessible.
+Pull Request preview deployments give every contributor a live, shareable URL for their branch — no
+local setup required. Reviewers can test UI changes, check responsiveness, and catch regressions
+before merging. For a student project, this dramatically lowers the feedback loop and makes code
+review more visual and accessible.
 
 ---
 
@@ -14,7 +18,9 @@ Pull Request preview deployments give every contributor a live, shareable URL fo
 
 ### 1. Vercel
 
-**How it works:** Connect your GitHub repo once. Vercel automatically builds and deploys every PR to a unique URL (e.g., `web3-student-lab-pr-42.vercel.app`). The GitHub integration posts the URL directly in the PR comment.
+**How it works:** Connect your GitHub repo once. Vercel automatically builds and deploys every PR to
+a unique URL (e.g., `web3-student-lab-pr-42.vercel.app`). The GitHub integration posts the URL
+directly in the PR comment.
 
 **Pros:**
 
@@ -36,7 +42,8 @@ Pull Request preview deployments give every contributor a live, shareable URL fo
 
 ### 2. Netlify
 
-**How it works:** Similar to Vercel. Netlify watches your repo and builds a "Deploy Preview" for each PR. The preview URL appears as a GitHub status check.
+**How it works:** Similar to Vercel. Netlify watches your repo and builds a "Deploy Preview" for
+each PR. The preview URL appears as a GitHub status check.
 
 **Pros:**
 
@@ -58,7 +65,8 @@ Pull Request preview deployments give every contributor a live, shareable URL fo
 
 ### 3. GitHub Pages + GitHub Actions (Self-Hosted Previews)
 
-**How it works:** A custom GitHub Actions workflow builds the project on every PR push and deploys to a `gh-pages`-style branch or uploads to an S3-compatible bucket / GitHub Pages subfolder.
+**How it works:** A custom GitHub Actions workflow builds the project on every PR push and deploys
+to a `gh-pages`-style branch or uploads to an S3-compatible bucket / GitHub Pages subfolder.
 
 **Pros:**
 
@@ -70,7 +78,8 @@ Pull Request preview deployments give every contributor a live, shareable URL fo
 **Cons:**
 
 - Significantly more setup and maintenance work
-- GitHub Pages does not natively support per-PR URLs — workarounds (subfolders, artifacts) are fragile
+- GitHub Pages does not natively support per-PR URLs — workarounds (subfolders, artifacts) are
+  fragile
 - No automatic teardown of old previews without extra scripting
 - Debugging pipeline failures can be time-consuming for students
 
@@ -80,7 +89,8 @@ Pull Request preview deployments give every contributor a live, shareable URL fo
 
 ### 4. Cloudflare Pages
 
-**How it works:** Cloudflare Pages connects to GitHub and deploys previews on every PR push, similar to Vercel and Netlify, but served from Cloudflare's edge network.
+**How it works:** Cloudflare Pages connects to GitHub and deploys previews on every PR push, similar
+to Vercel and Netlify, but served from Cloudflare's edge network.
 
 **Pros:**
 
@@ -118,17 +128,24 @@ For **Web3-Student-Lab**, **Vercel** is the recommended choice.
 
 **Reasons:**
 
-1. **Fastest time to value.** Students can get PR previews working in under 5 minutes with no configuration files. This keeps the focus on learning Web3 concepts, not DevOps.
+1. **Fastest time to value.** Students can get PR previews working in under 5 minutes with no
+   configuration files. This keeps the focus on learning Web3 concepts, not DevOps.
 
-2. **Best-in-class GitHub integration.** Vercel's GitHub bot automatically comments preview URLs on every PR — reviewers never have to hunt for a link.
+2. **Best-in-class GitHub integration.** Vercel's GitHub bot automatically comments preview URLs on
+   every PR — reviewers never have to hunt for a link.
 
-3. **Free for public repos.** The Hobby plan covers everything this project needs. There are no build minute caps that would block contributors during active sprints.
+3. **Free for public repos.** The Hobby plan covers everything this project needs. There are no
+   build minute caps that would block contributors during active sprints.
 
-4. **Framework agnostic.** Whether the project uses plain HTML, React, or a Web3 framework like scaffold-eth, Vercel detects and builds it correctly.
+4. **Framework agnostic.** Whether the project uses plain HTML, React, or a Web3 framework like
+   scaffold-eth, Vercel detects and builds it correctly.
 
-5. **Automatic cleanup.** Preview deployments are torn down when a PR is closed or merged, keeping the environment tidy.
+5. **Automatic cleanup.** Preview deployments are torn down when a PR is closed or merged, keeping
+   the environment tidy.
 
-Netlify is a solid runner-up and can be substituted if the team hits Vercel's free-tier team-size limits. GitHub Actions is worth exploring later as a learning exercise in CI/CD, but should not be the first choice here due to its setup complexity.
+Netlify is a solid runner-up and can be substituted if the team hits Vercel's free-tier team-size
+limits. GitHub Actions is worth exploring later as a learning exercise in CI/CD, but should not be
+the first choice here due to its setup complexity.
 
 ---
 

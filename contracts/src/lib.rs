@@ -8,6 +8,7 @@
 #![no_std]
 
 pub mod payment_gateway;
+pub mod session;
 pub mod staking;
 // Fuzz module uses `std` and legacy Soroban test patterns; keep out of the default test build
 // until it is refreshed for the current SDK (`sequence_number`, token `mint` arity, etc.).
@@ -493,8 +494,10 @@ impl CertificateContract {
                     .get(&DataKey::MintCap)
                     .unwrap_or(DEFAULT_MINT_CAP);
                 env.storage().instance().set(&DataKey::MintCap, &new_cap);
-                env.events()
-                    .publish((Symbol::new(&env, "v1_mint_cap_updated"),), (old_cap, new_cap));
+                env.events().publish(
+                    (Symbol::new(&env, "v1_mint_cap_updated"),),
+                    (old_cap, new_cap),
+                );
             }
             PendingAdminAction::Upgrade(new_wasm_hash) => {
                 // Upgrade risks (summary): malicious WASM can steal funds, brick storage layout,
@@ -593,12 +596,12 @@ impl CertificateContract {
 
         let total_certificates = symbols.len();
         let available = Self::check_and_update_mint_tracking(&env);
-        if (total_certificates as u32) > available {
+        if total_certificates > available {
             Self::release_lock(&env);
             panic_with_error!(&env, CertError::MintCapExceeded);
         }
 
-        Self::record_mint(&env, total_certificates as u32);
+        Self::record_mint(&env, total_certificates);
 
         let issue_date = env.ledger().timestamp();
         let mut issued: Vec<Certificate> = Vec::new(&env);
@@ -629,7 +632,10 @@ impl CertificateContract {
 
             // Batch event emission (emit one event per certificate for transparency)
             env.events().publish(
-                (Symbol::new(&env, "v1_batch_cert_issued"), course_symbol.clone()),
+                (
+                    Symbol::new(&env, "batch_cert_issued"),
+                    course_symbol.clone(),
+                ),
                 (student.clone(), course.clone()),
             );
 
@@ -638,19 +644,15 @@ impl CertificateContract {
 
         // Emit summary event for the entire batch operation
         env.events().publish(
-            (Symbol::new(&env, "v1_batch_issue_completed"),),
-            (
-                instructor.clone(),
-                total_certificates as u32,
-                course.clone(),
-            ),
+            (Symbol::new(&env, "batch_issue_completed"),),
+            (instructor.clone(), total_certificates, course.clone()),
         );
 
         env.events().publish(
-            (Symbol::new(&env, "v1_mint_period_update"),),
+            (Symbol::new(&env, "mint_period_update"),),
             (
                 env.ledger().sequence() / LEDGERS_PER_PERIOD,
-                total_certificates as u32,
+                total_certificates,
             ),
         );
 

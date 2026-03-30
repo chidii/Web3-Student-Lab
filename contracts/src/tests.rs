@@ -5,6 +5,8 @@ use soroban_sdk::{
     vec, Address, Env, FromVal, String, Symbol,
 };
 
+use crate::session::{SessionVerificationContract, SessionVerificationContractClient};
+
 fn setup() -> (
     Env,
     Address,
@@ -142,7 +144,8 @@ fn verifies_event_emitted_per_student() {
     let mut cert_issued_count = 0u32;
     for (addr, topics, _) in all_events.iter() {
         if addr == client.address
-            && Symbol::from_val(&env, &topics.get(0).unwrap()) == Symbol::new(&env, "v1_cert_issued")
+            && Symbol::from_val(&env, &topics.get(0).unwrap())
+                == Symbol::new(&env, "v1_cert_issued")
         {
             cert_issued_count += 1;
         }
@@ -249,6 +252,74 @@ fn non_admin_cannot_revoke_certificate() {
 
     let attacker = Address::generate(&env);
     client.revoke(&attacker, &course_symbol, &student);
+}
+
+fn setup_session() -> (Env, Address, SessionVerificationContractClient<'static>) {
+    let env = Env::default();
+    env.mock_all_auths();
+    let contract_id = env.register(SessionVerificationContract, ());
+    let client = SessionVerificationContractClient::new(&env, &contract_id);
+    let student = Address::generate(&env);
+    (env, student, client)
+}
+
+// ---------------------------------------------------------------------------
+// Session Verification Tests
+// ---------------------------------------------------------------------------
+
+#[test]
+fn test_session_start_and_verify() {
+    let (env, student, client) = setup_session();
+
+    let code = client.start_session(&student);
+
+    // Verify the code is valid
+    assert!(client.verify_session(&student, &code));
+
+    // Verify a wrong code is invalid
+    let wrong_code = BytesN::from_array(&env, &[0u8; 16]);
+    assert!(!client.verify_session(&student, &wrong_code));
+}
+
+#[test]
+fn test_session_expiration() {
+    let (env, student, client) = setup_session();
+
+    let code = client.start_session(&student);
+    assert!(client.verify_session(&student, &code));
+
+    // Jump forward in time by 201 ledgers to trigger expiration
+    // (We set TTL to 100-200 in start_session)
+    env.ledger().with_mut(|l| {
+        l.sequence_number += 201;
+    });
+
+    // Code should now be expired (None in temporary storage)
+    assert!(!client.verify_session(&student, &code));
+}
+
+#[test]
+fn test_session_extension() {
+    let (env, student, client) = setup_session();
+
+    let code = client.start_session(&student);
+
+    // Jump forward 50 ledgers
+    env.ledger().with_mut(|l| {
+        l.sequence_number += 50;
+    });
+
+    // Extend the session
+    client.extend_session(&student);
+
+    // Jump forward another 60 ledgers (total 110 since start)
+    // Without extension, it would have expired at 100.
+    env.ledger().with_mut(|l| {
+        l.sequence_number += 60;
+    });
+
+    // Code should still be valid because of extension
+    assert!(client.verify_session(&student, &code));
 }
 
 // ---------------------------------------------------------------------------
@@ -740,11 +811,7 @@ fn batch_issue_emits_events() {
     let (env, instructor, _, _, client) = setup();
 
     let symbols = vec![&env, symbol_short!("EVENT"), symbol_short!("EVENT2")];
-    let students = vec![
-        &env,
-        Address::generate(&env),
-        Address::generate(&env),
-    ];
+    let students = vec![&env, Address::generate(&env), Address::generate(&env)];
     let course_name = String::from_str(&env, "Event Test");
 
     client.batch_issue(&instructor, &symbols, &students, &course_name);
@@ -774,11 +841,13 @@ fn batch_issue_gas_efficiency() {
     let mut students = Vec::new(&env);
 
     // Create 10 different symbols without using format macro
-    let symbol_names = ["BATCH0", "BATCH1", "BATCH2", "BATCH3", "BATCH4",
-                         "BATCH5", "BATCH6", "BATCH7", "BATCH8", "BATCH9"];
+    let symbol_names = [
+        "BATCH0", "BATCH1", "BATCH2", "BATCH3", "BATCH4", "BATCH5", "BATCH6", "BATCH7", "BATCH8",
+        "BATCH9",
+    ];
 
-    for i in 0..10 {
-        symbols.push_back(Symbol::new(&env, symbol_names[i]));
+    for name in &symbol_names {
+        symbols.push_back(Symbol::new(&env, name));
         students.push_back(Address::generate(&env));
     }
 

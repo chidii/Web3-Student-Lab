@@ -1,6 +1,6 @@
 import request from 'supertest';
-import { app } from '../src/index.js';
 import prisma from '../src/db/index.js';
+import { app } from '../src/index.js';
 
 const courseFixtures = [
   {
@@ -65,9 +65,13 @@ describe('Learning Module Integration Tests', () => {
         .get('/api/v1/learning/courses?difficulty=beginner')
         .expect(200);
 
-      response.body.courses.forEach((course: any) => {
-        course.modules.forEach((module: any) => {
-          module.lessons.forEach((lesson: any) => {
+      interface TestLesson { difficulty: string }
+      interface TestModule { lessons: TestLesson[] }
+      interface TestCourse { modules: TestModule[] }
+
+      response.body.courses.forEach((course: TestCourse) => {
+        course.modules.forEach((module: TestModule) => {
+          module.lessons.forEach((lesson: TestLesson) => {
             expect(lesson.difficulty).toBe('beginner');
           });
         });
@@ -84,7 +88,9 @@ describe('Learning Module Integration Tests', () => {
     });
 
     it('returns 404 when the course does not exist', async () => {
-      const response = await request(app).get('/api/v1/learning/courses/unknown-course').expect(404);
+      const response = await request(app)
+        .get('/api/v1/learning/courses/unknown-course')
+        .expect(404);
 
       expect(response.body.error).toBe('Course not found');
     });

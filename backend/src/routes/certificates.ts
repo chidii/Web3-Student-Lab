@@ -1,4 +1,4 @@
-import { Router } from 'express';
+import { Request, Response, Router } from 'express';
 
 const router = Router();
 
@@ -15,7 +15,7 @@ interface MockCertificate {
 let certificates: MockCertificate[] = [];
 
 // GET /api/certificates - Get all certificates
-router.get('/', async (req, res) => {
+router.get('/', async (req: Request, res: Response) => {
   try {
     res.json(certificates);
   } catch {
@@ -24,7 +24,7 @@ router.get('/', async (req, res) => {
 });
 
 // GET /api/certificates/:id - Get certificate by ID
-router.get('/:id', async (req, res) => {
+router.get('/:id', async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     const certificate = certificates.find((c) => c.id === id);
@@ -40,7 +40,7 @@ router.get('/:id', async (req, res) => {
 });
 
 // GET /api/certificates/student/:studentId - Get certificates by student
-router.get('/student/:studentId', async (req, res) => {
+router.get('/student/:studentId', async (req: Request, res: Response) => {
   try {
     const { studentId } = req.params;
     const studentCerts = certificates.filter((c) => c.studentId === studentId);
@@ -51,7 +51,7 @@ router.get('/student/:studentId', async (req, res) => {
 });
 
 // POST /api/certificates - Issue a new certificate
-router.post('/', async (req, res) => {
+router.post('/', async (req: Request, res: Response) => {
   try {
     const { studentId, courseId, certificateHash } = req.body;
 
@@ -95,7 +95,7 @@ router.post('/', async (req, res) => {
 });
 
 // PUT /api/certificates/:id - Update certificate status
-router.put('/:id', async (req, res) => {
+router.put('/:id', async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     const { status, certificateHash } = req.body;
@@ -112,8 +112,28 @@ router.put('/:id', async (req, res) => {
   }
 });
 
+// GET /api/certificates/:id/verify - Verify a certificate on-chain
+router.get('/:id/verify', async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const certificate = certificates.find((c) => c.id === id);
+
+    if (!certificate) {
+      return res.status(404).json({ error: 'Certificate not found' });
+    }
+
+    // Mock on-chain verification
+    res.json({
+      verified: !!certificate.certificateHash,
+      hash: certificate.certificateHash,
+    });
+  } catch {
+    res.status(500).json({ error: 'Failed to verify certificate' });
+  }
+});
+
 // DELETE /api/certificates/:id - Revoke a certificate
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     certificates = certificates.filter((c) => c.id !== id);

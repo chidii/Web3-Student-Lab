@@ -1,6 +1,7 @@
 # Git Commit Guidelines
 
-To keep project history clear and professional, this repository enforces [Conventional Commits](https://www.conventionalcommits.org/).
+To keep project history clear and professional, this repository enforces
+[Conventional Commits](https://www.conventionalcommits.org/).
 
 ## Commit Format
 
@@ -45,4 +46,5 @@ Invalid:
 
 ## Contributor Coordination Rule
 
-When expressing interest in an issue, include an ETA of no more than 2 days so maintainers can coordinate work efficiently.
+When expressing interest in an issue, include an ETA of no more than 2 days so maintainers can
+coordinate work efficiently.

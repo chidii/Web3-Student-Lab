@@ -1,6 +1,7 @@
 # Full Stack Integration Guide
 
-This guide explains how the frontend, backend, and smart contract work together in the Web3 Student Lab platform.
+This guide explains how the frontend, backend, and smart contract work together in the Web3 Student
+Lab platform.
 
 ## Architecture Overview
 
@@ -31,9 +32,9 @@ All API communication happens through the typed client in `/frontend/src/lib/api
 
 ```typescript
 // Frontend: User login
-const { user, token } = await authAPI.login({ 
-  email: 'student@example.com', 
-  password: 'password123' 
+const { user, token } = await authAPI.login({
+  email: 'student@example.com',
+  password: 'password123',
 });
 
 // Token is automatically stored in localStorage
@@ -46,22 +47,23 @@ const courses = await coursesAPI.getAll();
 
 #### Backend API Endpoints
 
-| Endpoint | Method | Frontend Function | Description |
-|----------|--------|-------------------|-------------|
-| `/auth/register` | POST | `authAPI.register()` | Register new student |
-| `/auth/login` | POST | `authAPI.login()` | Student login |
-| `/auth/me` | GET | `authAPI.getCurrentUser()` | Get current user |
-| `/courses` | GET | `coursesAPI.getAll()` | List all courses |
-| `/courses/:id` | GET | `coursesAPI.getById()` | Get course details |
-| `/enrollments` | POST | `enrollmentsAPI.enroll()` | Enroll in course |
-| `/certificates/student/:id` | GET | `certificatesAPI.getByStudentId()` | Get student certificates |
-| `/verify` | GET | `verifyCertificateOnChain()` | Verify on blockchain |
+| Endpoint                    | Method | Frontend Function                  | Description              |
+| --------------------------- | ------ | ---------------------------------- | ------------------------ |
+| `/auth/register`            | POST   | `authAPI.register()`               | Register new student     |
+| `/auth/login`               | POST   | `authAPI.login()`                  | Student login            |
+| `/auth/me`                  | GET    | `authAPI.getCurrentUser()`         | Get current user         |
+| `/courses`                  | GET    | `coursesAPI.getAll()`              | List all courses         |
+| `/courses/:id`              | GET    | `coursesAPI.getById()`             | Get course details       |
+| `/enrollments`              | POST   | `enrollmentsAPI.enroll()`          | Enroll in course         |
+| `/certificates/student/:id` | GET    | `certificatesAPI.getByStudentId()` | Get student certificates |
+| `/verify`                   | GET    | `verifyCertificateOnChain()`       | Verify on blockchain     |
 
 ### 2. Backend ↔ Database
 
 The backend uses Prisma ORM to interact with PostgreSQL.
 
 **Schema Models**:
+
 - `Student` - User accounts
 - `Course` - Available courses
 - `Enrollment` - Course enrollments
@@ -69,6 +71,7 @@ The backend uses Prisma ORM to interact with PostgreSQL.
 - `Feedback` - Course reviews
 
 **Database Connection**:
+
 ```typescript
 // Backend: src/db/index.ts
 import { PrismaClient } from '@prisma/client';
@@ -81,10 +84,12 @@ export default prisma;
 The backend integrates with Soroban contracts for certificate issuance and verification.
 
 **Contract Functions**:
+
 - `issue(symbol, student, course_name)` - Issue certificate on-chain
 - `get_certificate(symbol)` - Retrieve certificate from blockchain
 
 **Integration Point**:
+
 ```typescript
 // Backend: When issuing a certificate
 await prisma.certificate.create({
@@ -92,7 +97,7 @@ await prisma.certificate.create({
     studentId,
     courseId,
     status: 'pending', // Will be updated after on-chain issuance
-  }
+  },
 });
 
 // Then call Soroban contract
@@ -116,24 +121,28 @@ const certData = await verifyCertificateOnChain('CERTIFICATE_SYMBOL');
 ### Example 1: Student Enrollment Flow
 
 1. **Frontend**: Student browses courses (`/courses`)
+
    ```typescript
    const courses = await coursesAPI.getAll();
    ```
 
 2. **Backend**: Fetches courses from database
+
    ```typescript
    const courses = await prisma.course.findMany();
    ```
 
 3. **Frontend**: Student clicks "Enroll" on course detail page
+
    ```typescript
    await enrollmentsAPI.enroll(user.id, course.id);
    ```
 
 4. **Backend**: Creates enrollment record
+
    ```typescript
    const enrollment = await prisma.enrollment.create({
-     data: { studentId, courseId, status: 'active' }
+     data: { studentId, courseId, status: 'active' },
    });
    ```
 
@@ -142,33 +151,36 @@ const certData = await verifyCertificateOnChain('CERTIFICATE_SYMBOL');
 ### Example 2: Certificate Issuance & Verification
 
 1. **Backend**: Student completes course
+
    ```typescript
    // Create certificate in database
    const cert = await prisma.certificate.create({
      data: {
        studentId,
        courseId,
-       status: 'pending'
-     }
+       status: 'pending',
+     },
    });
    ```
 
 2. **Backend**: Issue on Soroban blockchain
+
    ```typescript
    const symbol = `CERT-${course.code}-${student.id}`;
    await sorobanClient.issue(symbol, student.name, course.title);
-   
+
    // Update certificate with on-chain hash
    await prisma.certificate.update({
      where: { id: cert.id },
-     data: { 
+     data: {
        certificateHash: txHash,
-       status: 'issued'
-     }
+       status: 'issued',
+     },
    });
    ```
 
 3. **Frontend**: Display certificate to student
+
    ```typescript
    const certificates = await certificatesAPI.getByStudentId(user.id);
    ```
@@ -295,6 +307,7 @@ curl -X POST http://localhost:8080/api/enrollments \
 **Problem**: CORS errors or connection refused
 
 **Solutions**:
+
 1. Ensure backend is running: `curl http://localhost:8080/health`
 2. Check `NEXT_PUBLIC_API_URL` in frontend `.env.local`
 3. Verify backend CORS configuration allows `http://localhost:3000`
@@ -304,6 +317,7 @@ curl -X POST http://localhost:8080/api/enrollments \
 **Problem**: 401 Unauthorized errors
 
 **Solutions**:
+
 1. Clear browser localStorage
 2. Re-login to get fresh token
 3. Check JWT_SECRET matches in backend
@@ -314,6 +328,7 @@ curl -X POST http://localhost:8080/api/enrollments \
 **Problem**: Can't verify certificates on-chain
 
 **Solutions**:
+
 1. Check `NEXT_PUBLIC_CERTIFICATE_CONTRACT_ID` is set
 2. Verify Soroban RPC endpoint is accessible
 3. Ensure contract is deployed to the network
@@ -402,4 +417,5 @@ app.use((req, res, next) => {
 
 ---
 
-This integration ensures seamless communication between all three layers while maintaining security, performance, and scalability.
+This integration ensures seamless communication between all three layers while maintaining security,
+performance, and scalability.

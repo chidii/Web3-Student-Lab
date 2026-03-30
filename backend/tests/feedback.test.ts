@@ -142,7 +142,9 @@ describe('Feedback Module Integration Tests', () => {
     });
 
     it('should return 404 for non-existent course', async () => {
-      const response = await request(app).get('/api/v1/feedback/course/non-existent-id').expect(404);
+      const response = await request(app)
+        .get('/api/v1/feedback/course/non-existent-id')
+        .expect(404);
 
       expect(response.body).toHaveProperty('error');
     });

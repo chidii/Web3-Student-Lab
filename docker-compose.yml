@@ -8,11 +8,11 @@ services:
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: web3-student-lab
     ports:
-      - '5432:5432'
+      - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ['CMD-SHELL', 'pg_isready -U postgres']
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -24,7 +24,7 @@ services:
     container_name: web3-student-lab-backend
     restart: always
     ports:
-      - '8080:8080'
+      - "8080:8080"
     environment:
       - DATABASE_URL=postgresql://postgres:postgres@db:5432/web3-student-lab?schema=public
       - NODE_ENV=development
