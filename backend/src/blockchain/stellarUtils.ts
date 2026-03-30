@@ -64,7 +64,7 @@ export async function checkAccountExists(publicKey: string): Promise<AccountInfo
   try {
     const account = await server.loadAccount(publicKey);
     const balances = account.balances.map((b) => ({
-      asset: b.asset_type === 'native' ? 'XLM' : ('asset_code' in b ? b.asset_code : b.asset_type),
+      asset: b.asset_type === 'native' ? 'XLM' : 'asset_code' in b ? b.asset_code : b.asset_type,
       balance: b.balance,
     }));
 

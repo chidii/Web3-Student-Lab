@@ -1,7 +1,7 @@
 # Design System
 
-This document defines the design tokens and UI foundations used across the platform.
-It ensures consistency in colors, typography, spacing, and component styling.
+This document defines the design tokens and UI foundations used across the platform. It ensures
+consistency in colors, typography, spacing, and component styling.
 
 ---
 

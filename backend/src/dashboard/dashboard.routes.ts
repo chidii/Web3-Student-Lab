@@ -18,11 +18,11 @@ router.get('/stats', async (req: Request, res: Response) => {
 });
 
 /**
- * @route   GET /api/dashboard/:studentId
+ * @route   GET /api/dashboard/student/:studentId
  * @desc    Get accurate student profile and achievements aggregated from all modules
  * @access  Public (should apply auth globally later)
  */
-router.get('/:studentId', async (req: Request, res: Response) => {
+router.get('/student/:studentId', async (req: Request, res: Response) => {
   try {
     const { studentId } = req.params;
 

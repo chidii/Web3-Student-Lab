@@ -5,6 +5,8 @@ use soroban_sdk::{
     vec, Address, Env, FromVal, String, Symbol,
 };
 
+use crate::session::{SessionVerificationContract, SessionVerificationContractClient};
+
 fn setup() -> (
     Env,
     Address,
@@ -277,6 +279,74 @@ fn non_admin_cannot_revoke_certificate() {
 
     let attacker = Address::generate(&env);
     client.revoke(&attacker, &course_symbol, &student);
+}
+
+fn setup_session() -> (Env, Address, SessionVerificationContractClient<'static>) {
+    let env = Env::default();
+    env.mock_all_auths();
+    let contract_id = env.register(SessionVerificationContract, ());
+    let client = SessionVerificationContractClient::new(&env, &contract_id);
+    let student = Address::generate(&env);
+    (env, student, client)
+}
+
+// ---------------------------------------------------------------------------
+// Session Verification Tests
+// ---------------------------------------------------------------------------
+
+#[test]
+fn test_session_start_and_verify() {
+    let (env, student, client) = setup_session();
+
+    let code = client.start_session(&student);
+
+    // Verify the code is valid
+    assert!(client.verify_session(&student, &code));
+
+    // Verify a wrong code is invalid
+    let wrong_code = BytesN::from_array(&env, &[0u8; 16]);
+    assert!(!client.verify_session(&student, &wrong_code));
+}
+
+#[test]
+fn test_session_expiration() {
+    let (env, student, client) = setup_session();
+
+    let code = client.start_session(&student);
+    assert!(client.verify_session(&student, &code));
+
+    // Jump forward in time by 201 ledgers to trigger expiration
+    // (We set TTL to 100-200 in start_session)
+    env.ledger().with_mut(|l| {
+        l.sequence_number += 201;
+    });
+
+    // Code should now be expired (None in temporary storage)
+    assert!(!client.verify_session(&student, &code));
+}
+
+#[test]
+fn test_session_extension() {
+    let (env, student, client) = setup_session();
+
+    let code = client.start_session(&student);
+
+    // Jump forward 50 ledgers
+    env.ledger().with_mut(|l| {
+        l.sequence_number += 50;
+    });
+
+    // Extend the session
+    client.extend_session(&student);
+
+    // Jump forward another 60 ledgers (total 110 since start)
+    // Without extension, it would have expired at 100.
+    env.ledger().with_mut(|l| {
+        l.sequence_number += 60;
+    });
+
+    // Code should still be valid because of extension
+    assert!(client.verify_session(&student, &code));
 }
 
 // ---------------------------------------------------------------------------
@@ -805,6 +875,8 @@ fn batch_issue_gas_efficiency() {
 
     for symbol_name in symbol_names {
         symbols.push_back(Symbol::new(&env, symbol_name));
+    for name in &symbol_names {
+        symbols.push_back(Symbol::new(&env, name));
         students.push_back(Address::generate(&env));
     }
 

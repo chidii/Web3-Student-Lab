@@ -1,6 +1,7 @@
 # 🏆 Contribution Hall of Fame
 
-Welcome to the Web3 Student Lab! This project thrives on community effort. Below are the contributors who have helped build this hub.
+Welcome to the Web3 Student Lab! This project thrives on community effort. Below are the
+contributors who have helped build this hub.
 
 ## 💻 Code & Technical
 

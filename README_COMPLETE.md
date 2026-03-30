@@ -1,10 +1,13 @@
 # Web3 Student Lab - Complete Platform Documentation
 
-A full-stack blockchain education platform with Soroban smart contracts, Stellar blockchain integration, and modern React frontend.
+A full-stack blockchain education platform with Soroban smart contracts, Stellar blockchain
+integration, and modern React frontend.
 
 ## 🎯 Project Overview
 
-Web3 Student Lab is a comprehensive learning platform that teaches blockchain development through hands-on courses. Students can enroll in courses, complete lessons, and earn verifiable certificates stored on the Stellar blockchain using Soroban smart contracts.
+Web3 Student Lab is a comprehensive learning platform that teaches blockchain development through
+hands-on courses. Students can enroll in courses, complete lessons, and earn verifiable certificates
+stored on the Stellar blockchain using Soroban smart contracts.
 
 ## 🏗️ Architecture
 
@@ -22,6 +25,7 @@ web3-student-lab/
 ### Technology Stack
 
 **Frontend**:
+
 - Next.js 16 (App Router)
 - React 19
 - TypeScript 5
@@ -30,6 +34,7 @@ web3-student-lab/
 - @stellar/stellar-sdk
 
 **Backend**:
+
 - Node.js + Express
 - TypeScript
 - Prisma ORM
@@ -38,6 +43,7 @@ web3-student-lab/
 - bcryptjs
 
 **Smart Contracts**:
+
 - Rust
 - Soroban SDK
 - Stellar Blockchain
@@ -45,6 +51,7 @@ web3-student-lab/
 ## ✅ Implementation Status
 
 ### Frontend - COMPLETE ✅
+
 - [x] Authentication (Login/Register)
 - [x] Student Dashboard
 - [x] Course Catalog
@@ -56,6 +63,7 @@ web3-student-lab/
 - [x] Blockchain Integration (Soroban ready)
 
 ### Backend - COMPLETE ✅
+
 - [x] RESTful API
 - [x] JWT Authentication
 - [x] User Management
@@ -67,6 +75,7 @@ web3-student-lab/
 - [x] Error Handling
 
 ### Smart Contract - READY ⚠️
+
 - [x] Certificate Contract (Rust)
 - [x] Issue Function
 - [x] Verify Function
@@ -90,6 +99,7 @@ web3-student-lab/
 ```
 
 This script will:
+
 1. Install all dependencies
 2. Create environment files
 3. Set up the database
@@ -206,11 +216,13 @@ The platform uses JWT-based authentication:
 ## 📦 API Endpoints
 
 ### Authentication
+
 - `POST /api/auth/register` - Register new student
 - `POST /api/auth/login` - Student login
 - `GET /api/auth/me` - Get current user
 
 ### Courses
+
 - `GET /api/courses` - List all courses
 - `GET /api/courses/:id` - Get course details
 - `POST /api/courses` - Create course (admin)
@@ -218,6 +230,7 @@ The platform uses JWT-based authentication:
 - `DELETE /api/courses/:id` - Delete course
 
 ### Enrollments
+
 - `GET /api/enrollments` - List enrollments
 - `GET /api/enrollments/student/:id` - Student's enrollments
 - `POST /api/enrollments` - Enroll in course
@@ -225,6 +238,7 @@ The platform uses JWT-based authentication:
 - `DELETE /api/enrollments/:id` - Cancel enrollment
 
 ### Certificates
+
 - `GET /api/certificates` - List all certificates
 - `GET /api/certificates/:id` - Get certificate
 - `GET /api/certificates/student/:id` - Student's certificates
@@ -233,11 +247,13 @@ The platform uses JWT-based authentication:
 - `DELETE /api/certificates/:id` - Revoke certificate
 
 ### Feedback
+
 - `POST /api/feedback` - Submit course feedback
 - `GET /api/feedback/course/:id` - Course feedback
 - `GET /api/feedback/course/:id/summary` - Feedback summary
 
 ### Dashboard
+
 - `GET /api/dashboard/stats` - Platform statistics
 - `GET /api/dashboard/student/:id` - Student dashboard data
 
@@ -253,7 +269,7 @@ impl CertificateContract {
     pub fn issue(env: Env, symbol: Symbol, student: String, course_name: String) -> Certificate {
         // Issues certificate to blockchain
     }
-    
+
     pub fn get_certificate(env: Env, symbol: Symbol) -> Certificate {
         // Retrieves certificate from blockchain
     }
@@ -313,7 +329,7 @@ model Student {
   lastName  String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  
+
   enrollments   Enrollment[]
   certificates  Certificate[]
   feedback      Feedback[]
@@ -327,7 +343,7 @@ model Course {
   credits     Int      @default(3)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
-  
+
   enrollments   Enrollment[]
   certificates  Certificate[]
   feedback      Feedback[]
@@ -340,7 +356,7 @@ model Certificate {
   issuedAt    DateTime @default(now())
   certificateHash String?
   status      String   @default("pending")
-  
+
   student     Student  @relation(fields: [studentId], references: [id])
   course      Course   @relation(fields: [courseId], references: [id])
 }
@@ -351,10 +367,10 @@ model Enrollment {
   courseId   String
   enrolledAt DateTime @default(now())
   status     String   @default("active")
-  
+
   student    Student  @relation(fields: [studentId], references: [id])
   course     Course   @relation(fields: [courseId], references: [id])
-  
+
   @@unique([studentId, courseId])
 }
 
@@ -366,10 +382,10 @@ model Feedback {
   review      String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
-  
+
   student     Student  @relation(fields: [studentId], references: [id])
   course      Course   @relation(fields: [courseId], references: [id])
-  
+
   @@unique([studentId, courseId])
 }
 ```
@@ -392,14 +408,17 @@ model Feedback {
 ## 🔧 Development Tools
 
 ### Backend
+
 - Prisma Studio: `npx prisma studio`
 - Database migrations: `npx prisma migrate dev`
 
 ### Frontend
+
 - Build analyzer: `npm run build`
 - Linting: `npm run lint`
 
 ### Contracts
+
 - Build: `cargo build --release`
 - Test: `cargo test`
 - Deploy: `soroban contract deploy`
@@ -407,16 +426,19 @@ model Feedback {
 ## 🐛 Troubleshooting
 
 ### Backend won't start
+
 - Check PostgreSQL is running
 - Verify DATABASE_URL in .env
 - Run `npx prisma generate`
 
 ### Frontend build errors
+
 - Clear `.next` folder
 - Delete `node_modules` and reinstall
 - Check TypeScript version
 
 ### Database connection issues
+
 - Ensure PostgreSQL is running
 - Check database credentials
 - Verify database exists

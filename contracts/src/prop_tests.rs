@@ -34,8 +34,7 @@ mod tests {
                 sum += bal;
             }
             assert_eq!(
-                sum,
-                net[token_id as usize],
+                sum, net[token_id as usize],
                 "supply invariant broken: token_id={token_id} sum={sum} expected={}",
                 net[token_id as usize]
             );

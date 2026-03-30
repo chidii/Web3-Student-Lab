@@ -14,13 +14,11 @@ export type StellarNetwork = 'mainnet' | 'testnet' | 'public';
  */
 export function getExplorerLink(
   txHash: string,
-  network: StellarNetwork = (getEnvVar('STELLAR_NETWORK', 'testnet') as StellarNetwork)
+  network: StellarNetwork = getEnvVar('STELLAR_NETWORK', 'testnet') as StellarNetwork
 ): string {
   // Normalize network name for stellar.expert
   // stellar.expert uses 'public' for mainnet and 'testnet' for testnet
-  const networkParam = (network === 'mainnet' || network === 'public')
-    ? 'public'
-    : 'testnet';
+  const networkParam = network === 'mainnet' || network === 'public' ? 'public' : 'testnet';
 
   return `https://stellar.expert/explorer/${networkParam}/tx/${txHash}`;
 }
@@ -34,11 +32,9 @@ export function getExplorerLink(
  */
 export function getAccountExplorerLink(
   publicKey: string,
-  network: StellarNetwork = (getEnvVar('STELLAR_NETWORK', 'testnet') as StellarNetwork)
+  network: StellarNetwork = getEnvVar('STELLAR_NETWORK', 'testnet') as StellarNetwork
 ): string {
-  const networkParam = (network === 'mainnet' || network === 'public')
-    ? 'public'
-    : 'testnet';
+  const networkParam = network === 'mainnet' || network === 'public' ? 'public' : 'testnet';
 
   return `https://stellar.expert/explorer/${networkParam}/account/${publicKey}`;
 }

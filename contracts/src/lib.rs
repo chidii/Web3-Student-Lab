@@ -8,6 +8,7 @@
 #![no_std]
 
 pub mod payment_gateway;
+pub mod session;
 pub mod staking;
 // Fuzz module uses `std` and legacy Soroban test patterns; keep out of the default test build
 // until it is refreshed for the current SDK (`sequence_number`, token `mint` arity, etc.).
@@ -662,6 +663,7 @@ impl CertificateContract {
             env.events().publish(
                 (
                     Symbol::new(&env, "v1_batch_cert_issued"),
+                    Symbol::new(&env, "batch_cert_issued"),
                     course_symbol.clone(),
                 ),
                 (student.clone(), course.clone()),
@@ -673,11 +675,12 @@ impl CertificateContract {
         // Emit summary event for the entire batch operation
         env.events().publish(
             (Symbol::new(&env, "v1_batch_issue_completed"),),
+            (Symbol::new(&env, "batch_issue_completed"),),
             (instructor.clone(), total_certificates, course.clone()),
         );
 
         env.events().publish(
-            (Symbol::new(&env, "v1_mint_period_update"),),
+            (Symbol::new(&env, "mint_period_update"),),
             (
                 env.ledger().sequence() / LEDGERS_PER_PERIOD,
                 total_certificates,

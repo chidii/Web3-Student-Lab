@@ -310,6 +310,7 @@ User Action         Frontend            Backend             Database
 ```
 
 This architecture ensures:
+
 - ✅ Scalability
 - ✅ Security
 - ✅ Performance

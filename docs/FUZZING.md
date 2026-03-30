@@ -4,26 +4,32 @@ This document describes the fuzzing setup implemented for the Web3 Student Lab S
 
 ## Overview
 
-The fuzzing module (`contracts/src/fuzz.rs`) implements property-based testing to find edge cases in the Certificate and Token contract logic. Since Soroban-SDK doesn't have native cargo-fuzz integration, we use structured property-based testing with deterministic pseudo-random inputs.
+The fuzzing module (`contracts/src/fuzz.rs`) implements property-based testing to find edge cases in
+the Certificate and Token contract logic. Since Soroban-SDK doesn't have native cargo-fuzz
+integration, we use structured property-based testing with deterministic pseudo-random inputs.
 
 ## Target Edge Cases
 
 ### 1. Overflow/Underflow
+
 - **Mint cap arithmetic**: Boundary conditions when adding certificates
 - **Ledger period division**: Handling of high ledger sequence numbers
 - **Token amount overflow**: Large i128 values in token minting
 
 ### 2. Storage Collisions
+
 - **Composite keys**: Different (course_symbol, student) pairs should not collide
 - **Revocation isolation**: Revoking one certificate shouldn't affect others
 - **Cross-course uniqueness**: Certificates for different courses should be independent
 
 ### 3. Boundary Conditions
+
 - **Mint cap limits**: Exact cap, cap + 1, zero cap
 - **Period boundaries**: Mint tracking should reset correctly at period boundaries
 - **Empty inputs**: Issue with 0 students, single student edge cases
 
 ### 4. Authorization
+
 - **Non-admin access**: Verifying authorization checks work correctly
 - **Cross-contract calls**: Token minting authorization
 - **Double initialization**: Preventing contract re-initialization
@@ -146,36 +152,43 @@ thread '...' panicked at '...'
 ## Test Categories
 
 ### Mint Cap Boundary Fuzzing (`mint_cap_fuzzing`)
+
 - Tests exact cap boundary conditions
 - Tests cumulative mint counting across multiple issues
 - Tests edge cases like zero batch, exact cap, cap + 1
 
 ### Storage Collision Fuzzing (`storage_collision_fuzzing`)
+
 - Verifies different (course, student) pairs don't collide
 - Tests composite key uniqueness
 - Verifies revocation isolation between students
 
 ### Period Boundary Fuzzing (`period_boundary_fuzzing`)
+
 - Tests mint counter reset at period boundaries
 - Tests multiple period advances
 - Tests handling of high ledger sequence numbers
 
 ### Token Fuzzing (`token_fuzzing`)
+
 - Tests authorization requirements
 - Tests various token amounts
 - Tests cumulative minting
 - Tests multiple student handling
 
 ### Event Emission Fuzzing (`event_emission_fuzzing`)
+
 - Verifies correct number of events emitted
 - Tests cert_issued, cert_revoked, mint_period_update events
 
 ### Stress Fuzzing (`stress_fuzzing`)
+
 - Large batch sizes
 - Concurrent mint and revoke operations
 - Empty and single student edge cases
 
 ### Regression Tests (`regression_tests`)
+
 - Double initialization prevention
 - Zero mint cap rejection
 - Unauthorized revoke prevention

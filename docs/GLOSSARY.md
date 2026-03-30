@@ -1,12 +1,14 @@
 # Web3 Glossary
 
-This glossary explains common Web3 terms used in this lab. It is designed for students who are new to blockchain and decentralized applications.
+This glossary explains common Web3 terms used in this lab. It is designed for students who are new
+to blockchain and decentralized applications.
 
 ---
 
 ## DAO (Decentralized Autonomous Organization)
 
-A DAO is a group or organization that is run by code and community voting instead of a central authority.
+A DAO is a group or organization that is run by code and community voting instead of a central
+authority.
 
 - Decisions are made by members through voting
 - Rules are written in smart contracts
@@ -30,7 +32,8 @@ Similar to paying a small fee to use a service.
 
 ## WASM (WebAssembly)
 
-WASM is a fast, low-level programming format that allows code to run efficiently on different platforms.
+WASM is a fast, low-level programming format that allows code to run efficiently on different
+platforms.
 
 - Used to run smart contracts in some blockchains
 - Faster and more secure than traditional scripting
@@ -42,7 +45,8 @@ Think of it as a universal format that helps programs run quickly everywhere.
 
 ## Smart Contract
 
-A smart contract is a program stored on the blockchain that runs automatically when certain conditions are met.
+A smart contract is a program stored on the blockchain that runs automatically when certain
+conditions are met.
 
 - No middleman required
 - Cannot be changed easily once deployed
@@ -150,4 +154,5 @@ Like a normal app, but not controlled by one company.
 
 ## Final Note
 
-Web3 can feel confusing at first, but these terms form the foundation. As you build projects and interact with blockchain systems, these concepts will become clearer over time.
+Web3 can feel confusing at first, but these terms form the foundation. As you build projects and
+interact with blockchain systems, these concepts will become clearer over time.
