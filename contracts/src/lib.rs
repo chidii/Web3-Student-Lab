@@ -7,6 +7,7 @@
 
 #![no_std]
 
+pub mod enrollment;
 pub mod payment_gateway;
 pub mod sai_wrapper;
 pub mod session;
