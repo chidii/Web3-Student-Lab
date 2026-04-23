@@ -1059,3 +1059,10 @@ fn get_event_version_returns_one() {
     let (_env, _a, _b, _c, client) = setup();
     assert_eq!(client.get_event_version(), 1u32);
 }
+
+// ---------------------------------------------------------------------------
+// Upgrade and Admin Tests
+// ---------------------------------------------------------------------------
+
+mod upgrade_test;
+mod admin_test;

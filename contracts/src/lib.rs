@@ -7,18 +7,22 @@
 
 #![no_std]
 
+pub mod admin;
 pub mod enrollment;
 pub mod payment_gateway;
 pub mod sai_wrapper;
 pub mod session;
 pub mod staking;
+pub mod upgrade;
 // Fuzz module uses `std` and legacy Soroban test patterns; keep out of the default test build
 // until it is refreshed for the current SDK (`sequence_number`, token `mint` arity, etc.).
 // #[cfg(test)]
 // pub mod fuzz;
 pub mod token;
 
+use crate::admin::{AdminPolicy, AdminRole, Permission};
 use crate::token::RsTokenContractClient;
+use crate::upgrade::{ContractVersion, PendingUpgrade};
 use soroban_sdk::xdr::ToXdr;
 use soroban_sdk::{
     contract, contracterror, contractimpl, contracttype, panic_with_error, Address, Bytes, BytesN,
@@ -567,6 +571,199 @@ impl CertificateContract {
         Self::require_governance_admin(&env, &signer_a);
         Self::require_governance_admin(&env, &signer_b);
         env.deployer().update_current_contract_wasm(new_wasm_hash);
+    }
+
+    /// Propose an upgrade with time-lock (24-hour delay)
+    /// Returns the proposal ID for tracking
+    pub fn propose_upgrade_with_timelock(
+        env: Env,
+        caller: Address,
+        new_wasm_hash: BytesN<32>,
+        changelog: String,
+    ) -> u64 {
+        caller.require_auth();
+        Self::require_governance_admin(&env, &caller);
+        
+        let idx = Self::governance_admin_index(&env, &caller)
+            .unwrap_or_else(|| panic_with_error!(&env, CertError::Unauthorized));
+        let approval_mask = 1u32.wrapping_shl(idx);
+        
+        upgrade::propose_upgrade(&env, new_wasm_hash.clone(), caller.clone(), approval_mask, changelog.clone());
+        
+        env.events().publish(
+            (Symbol::new(&env, "v1_upgrade_proposed"),),
+            (caller, new_wasm_hash, changelog),
+        );
+        
+        // Return a proposal ID (using timestamp as ID for simplicity)
+        env.ledger().timestamp()
+    }
+
+    /// Approve a pending upgrade (requires 2-of-3 governance admins)
+    pub fn approve_pending_upgrade(env: Env, caller: Address) {
+        caller.require_auth();
+        Self::require_governance_admin(&env, &caller);
+        
+        let mut pending = upgrade::get_pending_upgrade(&env)
+            .unwrap_or_else(|| panic_with_error!(&env, CertError::InvalidProposal));
+        
+        let idx = Self::governance_admin_index(&env, &caller)
+            .unwrap_or_else(|| panic_with_error!(&env, CertError::Unauthorized));
+        let bit = 1u32.wrapping_shl(idx);
+        
+        if pending.approval_mask & bit != 0 {
+            panic_with_error!(&env, CertError::AlreadyApproved);
+        }
+        
+        pending.approval_mask |= bit;
+        
+        env.storage()
+            .instance()
+            .set(&upgrade::UpgradeDataKey::PendingUpgrade, &pending);
+        
+        env.events().publish(
+            (Symbol::new(&env, "v1_upgrade_approved"),),
+            (caller, pending.approval_mask),
+        );
+    }
+
+    /// Execute a pending upgrade after time-lock expires and 2-of-3 approval
+    pub fn execute_pending_upgrade(env: Env, caller: Address) {
+        caller.require_auth();
+        Self::require_governance_admin(&env, &caller);
+        
+        let pending = upgrade::get_pending_upgrade(&env)
+            .unwrap_or_else(|| panic_with_error!(&env, CertError::InvalidProposal));
+        
+        // Check if time-lock has expired
+        if !upgrade::is_timelock_expired(&env, &pending) {
+            panic!("Time-lock has not expired yet");
+        }
+        
+        // Check if we have 2-of-3 approvals
+        let approvals = pending.approval_mask.count_ones();
+        if approvals < GOVERNANCE_THRESHOLD {
+            panic!("Insufficient approvals");
+        }
+        
+        upgrade::execute_upgrade(&env, &pending);
+        
+        env.events().publish(
+            (Symbol::new(&env, "v1_upgrade_executed"),),
+            (caller, pending.new_wasm_hash),
+        );
+    }
+
+    /// Cancel a pending upgrade (requires governance admin)
+    pub fn cancel_pending_upgrade(env: Env, caller: Address) {
+        caller.require_auth();
+        Self::require_governance_admin(&env, &caller);
+        
+        upgrade::clear_pending_upgrade(&env);
+        
+        env.events().publish(
+            (Symbol::new(&env, "v1_upgrade_cancelled"),),
+            caller,
+        );
+    }
+
+    /// Get the current contract version
+    pub fn get_current_version(env: Env) -> u32 {
+        upgrade::get_current_version(&env)
+    }
+
+    /// Get the complete version history
+    pub fn get_version_history(env: Env) -> Vec<ContractVersion> {
+        upgrade::get_version_history(&env)
+    }
+
+    /// Get a specific version from history
+    pub fn get_version(env: Env, version: u32) -> Option<ContractVersion> {
+        upgrade::get_version(&env, version)
+    }
+
+    /// Get pending upgrade details
+    pub fn get_pending_upgrade(env: Env) -> Option<PendingUpgrade> {
+        upgrade::get_pending_upgrade(&env)
+    }
+
+    /// Emergency rollback to a previous version (requires 2-of-3 governance admins)
+    pub fn emergency_rollback(
+        env: Env,
+        signer_a: Address,
+        signer_b: Address,
+        target_version: u32,
+    ) {
+        signer_a.require_auth();
+        signer_b.require_auth();
+        if signer_a == signer_b {
+            panic_with_error!(&env, CertError::Unauthorized);
+        }
+        Self::require_governance_admin(&env, &signer_a);
+        Self::require_governance_admin(&env, &signer_b);
+        
+        let wasm_hash = upgrade::rollback_to_version(&env, target_version)
+            .unwrap_or_else(|| panic!("Version not found in history"));
+        
+        env.events().publish(
+            (Symbol::new(&env, "v1_emergency_rollback"),),
+            (signer_a, signer_b, target_version, wasm_hash),
+        );
+    }
+
+    /// Add an admin with specific role and permissions
+    pub fn add_admin_with_role(
+        env: Env,
+        caller: Address,
+        new_admin: Address,
+        role: AdminRole,
+    ) {
+        caller.require_auth();
+        Self::require_governance_admin(&env, &caller);
+        
+        let permissions = admin::get_default_permissions(&env, role);
+        admin::add_admin(&env, new_admin.clone(), role, permissions);
+        
+        env.events().publish(
+            (Symbol::new(&env, "v1_admin_added"),),
+            (caller, new_admin, role),
+        );
+    }
+
+    /// Remove an admin
+    pub fn remove_admin_role(env: Env, caller: Address, admin_to_remove: Address) {
+        caller.require_auth();
+        Self::require_governance_admin(&env, &caller);
+        
+        admin::remove_admin(&env, &admin_to_remove);
+        
+        env.events().publish(
+            (Symbol::new(&env, "v1_admin_removed"),),
+            (caller, admin_to_remove),
+        );
+    }
+
+    /// Get admin policy for an address
+    pub fn get_admin_policy(env: Env, address: Address) -> Option<AdminPolicy> {
+        admin::get_admin_policy(&env, &address)
+    }
+
+    /// Check if an address has a specific permission
+    pub fn check_permission(env: Env, address: Address, permission: Permission) -> bool {
+        admin::has_permission(&env, &address, permission)
+    }
+
+    /// Transfer contract ownership
+    pub fn transfer_ownership(env: Env, caller: Address, new_owner: Address) {
+        caller.require_auth();
+        Self::require_governance_admin(&env, &caller);
+        
+        admin::transfer_ownership(&env, new_owner.clone());
+        
+        env.events().publish(
+            (Symbol::new(&env, "v1_ownership_transferred"),),
+            (caller, new_owner),
+        );
     }
 
     fn execute_pending_action(env: Env, action: PendingAdminAction) {
