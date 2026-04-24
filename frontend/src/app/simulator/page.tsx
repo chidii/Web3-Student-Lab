@@ -1,6 +1,8 @@
 "use client";
 
+import { NetworkGraph } from "@/components/simulator/NetworkGraph";
 import { useEffect, useState } from "react";
+
 
 interface Transaction {
   id: string;
@@ -105,16 +107,16 @@ export default function SimulatorPage() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 flex-grow">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8 flex-grow h-[calc(100vh-250px)]">
           {/* Recent Ledgers */}
-          <div className="lg:col-span-1 bg-zinc-950 border border-white/10 p-6 rounded-2xl flex flex-col shadow-2xl">
+          <div className="lg:col-span-1 bg-zinc-950 border border-white/10 p-6 rounded-2xl flex flex-col shadow-2xl overflow-hidden">
             <h3 className="text-sm font-bold border-b border-white/10 pb-4 mb-6 uppercase tracking-widest flex items-center justify-between">
               Ledger Chain
               <span className="text-[10px] text-gray-600 font-normal">
                 History [10]
               </span>
             </h3>
-            <div className="space-y-4 overflow-y-auto pr-2 custom-scrollbar">
+            <div className="space-y-4 overflow-y-auto pr-2 custom-scrollbar flex-grow">
               {ledgers.length === 0 && (
                 <p className="text-gray-700 italic text-xs">
                   Awaiting first ledger pulse...
@@ -143,22 +145,25 @@ export default function SimulatorPage() {
             </div>
           </div>
 
+          {/* Network Graph Visualizer */}
+          <div className="lg:col-span-2 flex flex-col h-full">
+            <NetworkGraph transactions={transactions} />
+          </div>
+
           {/* Live Transaction Stream */}
-          <div className="lg:col-span-2 bg-zinc-950 border border-white/10 p-6 rounded-2xl flex flex-col shadow-2xl min-h-[500px]">
+          <div className="lg:col-span-1 bg-zinc-950 border border-white/10 p-6 rounded-2xl flex flex-col shadow-2xl overflow-hidden">
             <h3 className="text-sm font-bold border-b border-white/10 pb-4 mb-6 uppercase tracking-widest flex items-center justify-between">
-              Transaction Stream
+              TX Stream
               <span className="text-[10px] text-gray-600 font-normal">
-                Active Memory [50]
+                Memory [50]
               </span>
             </h3>
-            <div className="flex-grow overflow-x-auto">
+            <div className="flex-grow overflow-y-auto custom-scrollbar">
               <table className="w-full text-left text-[11px] border-collapse">
                 <thead>
                   <tr className="text-gray-600 border-b border-white/5 uppercase tracking-widest">
                     <th className="pb-3 font-normal">Hash</th>
-                    <th className="pb-3 font-normal">Operation</th>
-                    <th className="pb-3 font-normal">Asset/Amt</th>
-                    <th className="pb-3 font-normal">Account</th>
+                    <th className="pb-3 font-normal">Op</th>
                     <th className="pb-3 font-normal text-right">Status</th>
                   </tr>
                 </thead>
@@ -172,19 +177,12 @@ export default function SimulatorPage() {
                         {tx.id}
                       </td>
                       <td className="py-3 font-bold text-gray-300">{tx.op}</td>
-                      <td className="py-3 font-mono">
-                        {tx.amount}{" "}
-                        <span className="text-gray-600">{tx.asset}</span>
-                      </td>
-                      <td className="py-3 text-gray-500 text-[10px]">
-                        {tx.source}
-                      </td>
                       <td className="py-3 text-right">
                         <span
                           className={`px-2 py-0.5 rounded text-[9px] font-black ${
                             tx.status === "SUCCESS"
-                              ? "bg-green-500/10 text-green-500 border border-green-500/30"
-                              : "bg-red-500/10 text-red-500 border border-red-500/30"
+                              ? "bg-green-500/10 text-green-500"
+                              : "bg-red-500/10 text-red-500"
                           }`}
                         >
                           {tx.status}
@@ -192,17 +190,6 @@ export default function SimulatorPage() {
                       </td>
                     </tr>
                   ))}
-                  {transactions.length === 0 && (
-                    <tr>
-                      <td
-                        colSpan={5}
-                        className="py-10 text-center text-gray-700 italic"
-                      >
-                        No incoming packets detected. Sync with global nodes to
-                        start data reception.
-                      </td>
-                    </tr>
-                  )}
                 </tbody>
               </table>
             </div>
