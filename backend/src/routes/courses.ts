@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { cacheMiddleware } from '../cache/CacheMiddleware.js';
 import { invalidateAllCourses, invalidateCourseCache } from '../cache/CacheInvalidation.js';
 import { cacheTTL } from '../config/redis.config.js';
+import { auditAction } from '../middleware/audit.js';
 
 const router = Router();
 
@@ -49,26 +50,30 @@ router.get('/', cacheMiddleware({ ttl: cacheTTL.courses.list }), async (req, res
 });
 
 // GET /api/courses/:id - Get course by ID
-router.get('/:id', cacheMiddleware({ 
-  ttl: cacheTTL.courses.detail,
-  keyGenerator: (req) => `course:${req.params.id}`
-}), async (req, res) => {
-  try {
-    const { id } = req.params;
-    const course = courses.find((c) => c.id === id);
+router.get(
+  '/:id',
+  cacheMiddleware({
+    ttl: cacheTTL.courses.detail,
+    keyGenerator: (req) => `course:${req.params.id}`,
+  }),
+  async (req, res) => {
+    try {
+      const { id } = req.params;
+      const course = courses.find((c) => c.id === id);
 
-    if (!course) {
-      return res.status(404).json({ error: 'Course not found' });
+      if (!course) {
+        return res.status(404).json({ error: 'Course not found' });
+      }
+
+      res.json(course);
+    } catch {
+      res.status(500).json({ error: 'Failed to fetch course' });
     }
-
-    res.json(course);
-  } catch {
-    res.status(500).json({ error: 'Failed to fetch course' });
-  }
-});
+  },
+);
 
 // POST /api/courses - Create a new course
-router.post('/', async (req, res) => {
+router.post('/', auditAction('CREATE_COURSE', 'Course'), async (req, res) => {
   try {
     const { title, description, instructor, credits } = req.body;
 
@@ -88,6 +93,7 @@ router.post('/', async (req, res) => {
 
     courses.push(newCourse);
     await invalidateAllCourses();
+
     res.status(201).json(newCourse);
   } catch {
     res.status(500).json({ error: 'Failed to create course' });
@@ -95,17 +101,19 @@ router.post('/', async (req, res) => {
 });
 
 // PUT /api/courses/:id - Update a course
-router.put('/:id', async (req, res) => {
+router.put('/:id', auditAction('UPDATE_COURSE', 'Course'), async (req, res) => {
   try {
     const { id } = req.params;
     const { title, description, instructor, credits } = req.body;
 
     const index = courses.findIndex((c) => c.id === id);
+
     if (index === -1) {
       return res.status(404).json({ error: 'Course not found' });
     }
 
     const targetCourse = courses[index];
+
     if (targetCourse) {
       Object.assign(targetCourse, {
         title,
@@ -115,7 +123,9 @@ router.put('/:id', async (req, res) => {
         updatedAt: new Date().toISOString(),
       });
     }
+
     await invalidateCourseCache(id);
+
     res.json(targetCourse);
   } catch {
     res.status(500).json({ error: 'Failed to update course' });
@@ -123,11 +133,14 @@ router.put('/:id', async (req, res) => {
 });
 
 // DELETE /api/courses/:id - Delete a course
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', auditAction('DELETE_COURSE', 'Course'), async (req, res) => {
   try {
     const { id } = req.params;
+
     courses = courses.filter((c) => c.id !== id);
+
     await invalidateCourseCache(id);
+
     res.status(204).send();
   } catch {
     res.status(500).json({ error: 'Failed to delete course' });

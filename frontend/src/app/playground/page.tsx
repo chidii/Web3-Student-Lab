@@ -1,17 +1,10 @@
 "use client";
 
+import { CodeEditor } from "@/components/playground/CodeEditor";
 import { useState } from "react";
 
-export default function PlaygroundPage() {
-  const [code, setCode] = useState(`#[soroban_sdk::contract]
-pub struct Contract;
 
-#[soroban_sdk::contractimpl]
-impl Contract {
-    pub fn hello(env: Env, to: Symbol) -> Vec<Symbol> {
-        vec![&env, symbol_short!("Hello"), to]
-    }
-}`);
+export default function PlaygroundPage() {
 
   const [output, setOutput] = useState("");
   const [isCompiling, setIsCompiling] = useState(false);
@@ -48,21 +41,25 @@ impl Contract {
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 flex-grow">
           {/* Editor Placeholder */}
-          <div className="bg-zinc-950 border border-white/10 rounded-3xl p-8 shadow-2xl relative flex flex-col">
-            <div className="flex items-center gap-2 mb-6 border-b border-white/5 pb-4">
-              <div className="w-3 h-3 rounded-full bg-red-500"></div>
-              <div className="w-3 h-3 rounded-full bg-zinc-700"></div>
-              <div className="w-3 h-3 rounded-full bg-zinc-700"></div>
-              <span className="ml-4 text-[10px] text-gray-500 font-bold uppercase tracking-widest">
-                contract.rs
-              </span>
+          <div className="bg-zinc-950 border border-white/10 rounded-3xl p-8 shadow-2xl relative flex flex-col min-h-[600px]">
+            <div className="flex items-center gap-2 mb-6 border-b border-white/5 pb-4 justify-between">
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 rounded-full bg-red-500"></div>
+                <div className="w-3 h-3 rounded-full bg-zinc-700"></div>
+                <div className="w-3 h-3 rounded-full bg-zinc-700"></div>
+                <span className="ml-4 text-[10px] text-gray-500 font-bold uppercase tracking-widest">
+                  contract.rs
+                </span>
+              </div>
+              <div className="flex items-center gap-2 bg-red-600/10 px-3 py-1 rounded-full border border-red-600/20">
+                <span className="text-[9px] font-black uppercase text-red-500 tracking-widest">Collaborative Mode</span>
+              </div>
             </div>
-            <textarea
-              value={code}
-              onChange={(e) => setCode(e.target.value)}
-              className="flex-grow bg-transparent text-gray-300 text-sm focus:outline-none resize-none leading-relaxed"
-              spellCheck={false}
-            />
+
+            <div className="flex-grow flex flex-col overflow-hidden rounded-xl border border-white/5">
+              <CodeEditor roomName="main-lab-session" />
+            </div>
+
             <button
               onClick={handleCompile}
               disabled={isCompiling}

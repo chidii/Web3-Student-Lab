@@ -12,7 +12,8 @@
     "test:coverage": "NODE_ENV=test jest --coverage",
     "lint": "eslint . --ext .ts",
     "format:check": "prettier --check .",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "collaboration": "tsx src/collaborationServer.ts"
   },
   "keywords": [],
   "author": "",
@@ -32,6 +33,9 @@
     "pg": "^8.20.0",
     "prisma": "^7.5.0",
     "winston": "^3.19.0",
+    "ws": "^8.20.0",
+    "y-websocket": "^3.0.0",
+    "yjs": "^13.6.30",
     "zod": "^4.3.6"
   },
   "devDependencies": {
@@ -42,6 +46,7 @@
     "@types/jsonwebtoken": "^9.0.9",
     "@types/node": "^25.5.0",
     "@types/supertest": "^7.2.0",
+    "@types/ws": "^8.18.1",
     "@typescript-eslint/eslint-plugin": "^8.57.2",
     "@typescript-eslint/parser": "^8.57.2",
     "eslint": "^10.1.0",
