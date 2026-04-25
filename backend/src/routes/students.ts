@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { normalizeSorobanDid } from '../auth/auth.service.js';
 import prisma from '../db/index.js';
+import { broadcastEvent } from '../websocket/gateway.js';
 import { linkDidToCertificates } from './certificates.js';
 
 const router = Router();
@@ -69,6 +70,13 @@ router.post('/', async (req, res) => {
         did: normalizedDid ?? null,
         password: 'placeholder_password', // TODO: Implement proper password hashing
       },
+    });
+
+    // Broadcast event
+    await broadcastEvent('dashboard_updated', {
+      type: 'STUDENT_CREATED',
+      studentId: student.id,
+      timestamp: new Date().toISOString(),
     });
 
     res.status(201).json(student);

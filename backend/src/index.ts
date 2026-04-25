@@ -2,11 +2,15 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import express, { Request, Response } from 'express';
 import { rateLimit } from 'express-rate-limit';
+import { createServer } from 'http';
+import { Server } from 'socket.io';
 import prisma from './db/index.js';
+import './jobs/export.worker.js'; // Initialize BullMQ worker
 import { requestLogger } from './middleware/requestLogger.js';
 import routes from './routes/index.js';
 import { validateEnvironment } from './utils/checkEnv.js';
 import logger from './utils/logger.js';
+import { initWebSocketGateway } from './websocket/gateway.js';
 
 // Load environment variables
 dotenv.config();
@@ -18,10 +22,21 @@ if (process.env.NODE_ENV !== 'test') {
 }
 
 export const app = express();
+const httpServer = createServer(app);
+const io = new Server(httpServer, {
+  cors: {
+    origin: '*', // In production, replace with actual frontend URL
+    methods: ['GET', 'POST'],
+  },
+});
+
 const port = process.env.PORT || 8080;
 
 app.use(cors());
 app.use(express.json());
+
+// Initialize WebSocket Gateway
+initWebSocketGateway(io);
 
 // Global Rate Limiting
 const limiter = rateLimit({
@@ -52,10 +67,10 @@ app.get('/health', (_req: Request, res: Response) => {
 app.use('/api/v1', routes);
 
 // Start server only if not in test environment
-let server: ReturnType<typeof app.listen> | null = null;
+let server: ReturnType<typeof httpServer.listen> | null = null;
 
 if (process.env.NODE_ENV !== 'test') {
-  server = app.listen(port, () => {
+  server = httpServer.listen(port, () => {
     logger.info(`Server is running on port ${port}`);
   });
 
