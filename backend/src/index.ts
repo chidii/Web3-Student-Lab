@@ -1,7 +1,6 @@
 import cors from 'cors';
 import dotenv from 'dotenv';
 import express, { Request, Response } from 'express';
-import { rateLimit } from 'express-rate-limit';
 import prisma from './db/index.js';
 import { requestLogger } from './middleware/requestLogger.js';
 import routes from './routes/index.js';
@@ -23,19 +22,10 @@ const port = process.env.PORT || 8080;
 app.use(cors());
 app.use(express.json());
 
-// Global Rate Limiting
-const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // Limit each IP to 100 requests per windowMs
-  standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
-  legacyHeaders: false, // Disable the `X-RateLimit-*` headers
-  message: {
-    status: 'error',
-    message: 'Too many requests from this IP, please try again after 15 minutes',
-  },
-});
+import { apiRateLimiter } from './middleware/rateLimiter.js';
 
-app.use(limiter);
+// Global Rate Limiting - now using sliding window
+app.use(apiRateLimiter);
 app.use(requestLogger);
 
 // Health check endpoint
