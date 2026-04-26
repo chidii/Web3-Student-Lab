@@ -14,6 +14,8 @@ import Link from "next/link";
 import AuditLogList from "@/components/dashboard/AuditLogList";
 import { WithSkeleton } from "@/components/ui/WithSkeleton";
 import { StatCardSkeleton, CourseCardSkeleton, CertCardSkeleton } from "@/components/ui/skeletons/CardSkeleton";
+import { ThemeToggle } from "@/components/ui/ThemeToggle";
+import { motion } from "framer-motion";
 
 export default function DashboardPage() {
   const { user, logout } = useAuth();
@@ -62,13 +64,13 @@ export default function DashboardPage() {
 
 
   return (
-    <div className="min-h-screen bg-black text-white selection:bg-red-600 selection:text-white pb-20 relative overflow-hidden">
+    <div className="min-h-screen bg-background text-foreground selection:bg-red-600 selection:text-white pb-20 relative overflow-hidden transition-colors duration-200">
       {/* Abstract Background Glow */}
       <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-red-600/5 rounded-full blur-[150px] pointer-events-none"></div>
       <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-red-600/5 rounded-full blur-[120px] pointer-events-none"></div>
 
       {/* Navigation Layer */}
-      <nav className="relative z-20 bg-zinc-950/80 backdrop-blur-md border-b border-white/10 sticky top-0">
+      <nav className="relative z-20 bg-bg-secondary/80 backdrop-blur-md border-b border-border-theme sticky top-0">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-20">
             <div className="flex items-center gap-4">
@@ -81,13 +83,14 @@ export default function DashboardPage() {
             </div>
             <div className="flex items-center gap-6">
               <div className="hidden md:flex flex-col items-end">
-                <span className="text-xs font-bold text-gray-500 uppercase tracking-widest">
+                <span className="text-xs font-bold text-text-secondary uppercase tracking-widest">
                   Active Operator
                 </span>
-                <span className="text-sm font-mono text-gray-300">
+                <span className="text-sm font-mono text-text-secondary">
                   {user?.name || "Unknown Entity"}
                 </span>
               </div>
+              <ThemeToggle />
               <button
                 onClick={logout}
                 className="px-5 py-2.5 text-xs font-bold text-red-500 bg-red-500/10 border border-red-500/30 rounded-lg hover:bg-red-500 hover:text-white transition-all uppercase tracking-widest"
@@ -103,12 +106,12 @@ export default function DashboardPage() {
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 relative z-10">
         {/* Welcome Section */}
         <div className="mb-12 border-l-4 border-red-600 pl-6 py-2">
-          <h2 className="text-4xl md:text-5xl font-black text-white mb-3 uppercase tracking-tight">
-            Terminal <span className="text-gray-500">Access Granted</span>
+          <h2 className="text-4xl md:text-5xl font-black text-foreground mb-3 uppercase tracking-tight">
+            Terminal <span className="text-text-secondary">Access Granted</span>
           </h2>
-          <p className="text-gray-400 font-light text-lg tracking-wide">
+          <p className="text-text-secondary font-light text-lg tracking-wide">
             Operator{" "}
-            <span className="text-white font-mono">
+            <span className="text-foreground font-mono">
               {user?.name?.split(" ")[0] || "Student"}
             </span>{" "}
             — Metrics and module connections active.
@@ -128,7 +131,7 @@ export default function DashboardPage() {
           }
         >
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
-          <div className="bg-zinc-950 border border-white/10 rounded-2xl p-6 hover:border-red-500/50 hover:shadow-[0_0_30px_rgba(220,38,38,0.1)] transition-all group relative overflow-hidden">
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }} className="bg-bg-secondary border border-border-theme rounded-2xl p-6 hover:border-red-500/50 hover:shadow-[0_0_30px_rgba(220,38,38,0.1)] transition-all group relative overflow-hidden">
             <div className="absolute top-0 right-0 w-16 h-16 bg-white/5 rounded-bl-3xl group-hover:bg-red-500/10 transition-colors"></div>
             <div className="flex items-center justify-between mb-4">
               <div className="w-12 h-12 bg-black border border-white/10 rounded-xl flex items-center justify-center group-hover:border-white/30 transition-colors">
@@ -150,12 +153,12 @@ export default function DashboardPage() {
                 {stats.totalCourses}
               </p>
             </div>
-            <p className="text-xs font-bold text-gray-500 uppercase tracking-widest mt-2">
+            <p className="text-xs font-bold text-text-secondary uppercase tracking-widest mt-2">
               Available Nodes
             </p>
-          </div>
+          </motion.div>
 
-          <div className="bg-zinc-950 border border-white/10 rounded-2xl p-6 hover:border-red-500/50 hover:shadow-[0_0_30px_rgba(220,38,38,0.1)] transition-all group relative overflow-hidden">
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }} className="bg-bg-secondary border border-border-theme rounded-2xl p-6 hover:border-red-500/50 hover:shadow-[0_0_30px_rgba(220,38,38,0.1)] transition-all group relative overflow-hidden">
             <div className="absolute top-0 right-0 w-16 h-16 bg-white/5 rounded-bl-3xl group-hover:bg-red-500/10 transition-colors"></div>
             <div className="flex items-center justify-between mb-4">
               <div className="w-12 h-12 bg-black border border-white/10 rounded-xl flex items-center justify-center group-hover:border-white/30 transition-colors">
@@ -177,12 +180,12 @@ export default function DashboardPage() {
                 {stats.enrolledCourses}
               </p>
             </div>
-            <p className="text-xs font-bold text-gray-500 uppercase tracking-widest mt-2">
+            <p className="text-xs font-bold text-text-secondary uppercase tracking-widest mt-2">
               Active Uplinks
             </p>
-          </div>
+          </motion.div>
 
-          <div className="bg-zinc-950 border border-white/10 rounded-2xl p-6 hover:border-red-500/50 hover:shadow-[0_0_30px_rgba(220,38,38,0.1)] transition-all group relative overflow-hidden">
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }} className="bg-bg-secondary border border-border-theme rounded-2xl p-6 hover:border-red-500/50 hover:shadow-[0_0_30px_rgba(220,38,38,0.1)] transition-all group relative overflow-hidden">
             <div className="absolute top-0 right-0 w-16 h-16 bg-white/5 rounded-bl-3xl group-hover:bg-red-500/10 transition-colors"></div>
             <div className="flex items-center justify-between mb-4">
               <div className="w-12 h-12 bg-black border border-white/10 rounded-xl flex items-center justify-center group-hover:border-white/30 transition-colors">
@@ -204,12 +207,12 @@ export default function DashboardPage() {
                 {stats.completedCourses}
               </p>
             </div>
-            <p className="text-xs font-bold text-gray-500 uppercase tracking-widest mt-2">
+            <p className="text-xs font-bold text-text-secondary uppercase tracking-widest mt-2">
               Executed Modules
             </p>
-          </div>
+          </motion.div>
 
-          <div className="bg-zinc-950 border border-white/10 rounded-2xl p-6 hover:border-red-500/50 hover:shadow-[0_0_30px_rgba(220,38,38,0.1)] transition-all group relative overflow-hidden">
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }} className="bg-bg-secondary border border-border-theme rounded-2xl p-6 hover:border-red-500/50 hover:shadow-[0_0_30px_rgba(220,38,38,0.1)] transition-all group relative overflow-hidden">
             <div className="absolute top-0 right-0 w-16 h-16 bg-white/5 rounded-bl-3xl group-hover:bg-red-500/10 transition-colors"></div>
             <div className="flex items-center justify-between mb-4">
               <div className="w-12 h-12 bg-black border border-white/10 rounded-xl flex items-center justify-center group-hover:border-white/30 transition-colors">
@@ -231,23 +234,23 @@ export default function DashboardPage() {
                 {stats.certificates}
               </p>
             </div>
-            <p className="text-xs font-bold text-gray-500 uppercase tracking-widest mt-2">
+            <p className="text-xs font-bold text-text-secondary uppercase tracking-widest mt-2">
               Cryptographic Tokens
             </p>
-          </div>
+          </motion.div>
         </div>
         </WithSkeleton>
 
         {/* Recent Courses */}
-        <div className="mb-16">
-          <div className="flex justify-between items-center mb-8 border-b border-white/10 pb-4">
-            <h3 className="text-xl font-black text-white uppercase tracking-widest flex items-center gap-3">
+        <div className="mb-16 [content-visibility:auto] [contain-intrinsic-size:1px_500px]">
+          <div className="flex justify-between items-center mb-8 border-b border-border-theme pb-4">
+            <h3 className="text-xl font-black text-foreground uppercase tracking-widest flex items-center gap-3">
               <span className="w-4 h-4 bg-red-600 rounded-sm inline-block"></span>{" "}
               Directory Nodes
             </h3>
             <Link
               href="/courses"
-              className="text-gray-400 hover:text-white uppercase text-xs font-bold tracking-widest transition-colors flex items-center gap-1 group"
+              className="text-text-secondary hover:text-foreground uppercase text-xs font-bold tracking-widest transition-colors flex items-center gap-1 group"
             >
               Scan All{" "}
               <span className="transform group-hover:translate-x-1 transition-transform">
@@ -266,27 +269,33 @@ export default function DashboardPage() {
             }
           >
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {courses.slice(0, 3).map((course) => (
+            {courses.slice(0, 3).map((course, index) => (
               <Link
                 key={course.id}
                 href={`/courses/${course.id}`}
-                className="bg-zinc-950 border border-white/5 p-8 hover:border-red-500/30 hover:bg-zinc-900 transition-all block group relative"
               >
-                <div className="absolute left-0 top-0 bottom-0 w-1 bg-transparent group-hover:bg-red-600 transition-colors"></div>
-                <h4 className="text-xl font-black text-white mb-3 uppercase tracking-tight group-hover:text-red-50">
-                  {course.title}
-                </h4>
-                <p className="text-gray-400 font-light text-sm mb-6 line-clamp-2">
-                  {course.description || "System metadata missing"}
-                </p>
-                <div className="flex justify-between items-center pt-6 border-t border-white/5">
-                  <span className="text-xs font-mono text-gray-500 px-2 py-1 bg-black border border-white/10 rounded">
-                    {course.credits} UNIT
-                  </span>
-                  <span className="text-xs font-bold text-red-500 uppercase tracking-widest group-hover:text-red-400">
-                    Connect
-                  </span>
-                </div>
+                <motion.div
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.4, delay: index * 0.1 }}
+                  className="bg-bg-secondary border border-border-theme/50 p-8 hover:border-red-500/30 hover:bg-bg-tertiary transition-all block group relative h-full"
+                >
+                  <div className="absolute left-0 top-0 bottom-0 w-1 bg-transparent group-hover:bg-red-600 transition-colors"></div>
+                  <h4 className="text-xl font-black text-foreground mb-3 uppercase tracking-tight group-hover:text-red-500 transition-colors">
+                    {course.title}
+                  </h4>
+                  <p className="text-text-secondary font-light text-sm mb-6 line-clamp-2">
+                    {course.description || "System metadata missing"}
+                  </p>
+                  <div className="flex justify-between items-center pt-6 border-t border-border-theme/50 mt-auto">
+                    <span className="text-xs font-mono text-text-secondary px-2 py-1 bg-background border border-border-theme rounded">
+                      {course.credits} UNIT
+                    </span>
+                    <span className="text-xs font-bold text-red-500 uppercase tracking-widest group-hover:text-red-400">
+                      Connect
+                    </span>
+                  </div>
+                </motion.div>
               </Link>
             ))}
           </div>
@@ -295,15 +304,15 @@ export default function DashboardPage() {
 
         {/* My Certificates */}
         {(isLoading || certificates.length > 0) && (
-          <div className="mb-16">
-            <div className="flex justify-between items-center mb-8 border-b border-white/10 pb-4">
-              <h3 className="text-xl font-black text-white uppercase tracking-widest flex items-center gap-3">
+          <div className="mb-16 [content-visibility:auto] [contain-intrinsic-size:1px_500px]">
+            <div className="flex justify-between items-center mb-8 border-b border-border-theme pb-4">
+              <h3 className="text-xl font-black text-foreground uppercase tracking-widest flex items-center gap-3">
                 <span className="w-4 h-4 bg-red-600 rounded-sm inline-block"></span>{" "}
                 Issued Credentials
               </h3>
               <Link
                 href="/certificates"
-                className="text-gray-400 hover:text-white uppercase text-xs font-bold tracking-widest transition-colors flex items-center gap-1 group"
+                className="text-text-secondary hover:text-foreground uppercase text-xs font-bold tracking-widest transition-colors flex items-center gap-1 group"
               >
                 Vault{" "}
                 <span className="transform group-hover:translate-x-1 transition-transform">
@@ -323,39 +332,45 @@ export default function DashboardPage() {
               }
             >
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {certificates.slice(0, 3).map((cert) => (
+              {certificates.slice(0, 3).map((cert, index) => (
                 <Link
                   key={cert.id}
                   href={`/certificates/${cert.id}`}
-                  className="bg-black border border-red-500/20 rounded-xl p-8 hover:border-red-500/60 shadow-[0_0_20px_rgba(220,38,38,0.05)] hover:shadow-[0_0_30px_rgba(220,38,38,0.2)] transition-all block relative group overflow-hidden"
                 >
-                  <div className="absolute top-0 right-0 w-32 h-32 bg-red-900/10 rounded-bl-full pointer-events-none group-hover:bg-red-900/20 transition-colors"></div>
-                  <div className="flex items-start justify-between mb-6 relative z-10">
-                    <div className="w-12 h-12 bg-zinc-950 border border-red-500/30 rounded-xl flex items-center justify-center">
-                      <svg
-                        className="w-6 h-6 text-red-500"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"
-                        />
-                      </svg>
+                  <motion.div
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.4, delay: index * 0.1 }}
+                    className="bg-background border border-red-500/20 rounded-xl p-8 hover:border-red-500/60 shadow-[0_0_20px_rgba(220,38,38,0.05)] hover:shadow-[0_0_30px_rgba(220,38,38,0.2)] transition-all block relative group overflow-hidden h-full"
+                  >
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-red-900/10 rounded-bl-full pointer-events-none group-hover:bg-red-900/20 transition-colors"></div>
+                    <div className="flex items-start justify-between mb-6 relative z-10">
+                      <div className="w-12 h-12 bg-bg-secondary border border-red-500/30 rounded-xl flex items-center justify-center">
+                        <svg
+                          className="w-6 h-6 text-red-500"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"
+                          />
+                        </svg>
+                      </div>
+                      <span className="text-xs font-mono bg-bg-secondary border border-border-theme text-text-secondary px-3 py-1 rounded">
+                        {new Date(cert.issuedAt).toLocaleDateString()}
+                      </span>
                     </div>
-                    <span className="text-xs font-mono bg-zinc-950 border border-white/10 text-gray-400 px-3 py-1 rounded">
-                      {new Date(cert.issuedAt).toLocaleDateString()}
-                    </span>
-                  </div>
-                  <h4 className="text-xl font-bold text-white mb-2 uppercase tracking-wide group-hover:text-red-100">
-                    {cert.course?.title || "Soroban Protocol"}
-                  </h4>
-                  <p className="text-sm font-light text-red-500/80">
-                    On-Chain Certification
-                  </p>
+                    <h4 className="text-xl font-bold text-foreground mb-2 uppercase tracking-wide group-hover:text-red-500 transition-colors">
+                      {cert.course?.title || "Soroban Protocol"}
+                    </h4>
+                    <p className="text-sm font-light text-red-500/80">
+                      On-Chain Certification
+                    </p>
+                  </motion.div>
                 </Link>
               ))}
             </div>
@@ -364,17 +379,17 @@ export default function DashboardPage() {
         )}
 
         {/* Audit Logs Section */}
-        <div className="mt-20">
-          <div className="flex justify-between items-center mb-8 border-b border-white/10 pb-4">
-            <h3 className="text-xl font-black text-white uppercase tracking-widest flex items-center gap-3">
+        <div className="mt-20 [content-visibility:auto] [contain-intrinsic-size:1px_500px]">
+          <div className="flex justify-between items-center mb-8 border-b border-border-theme pb-4">
+            <h3 className="text-xl font-black text-foreground uppercase tracking-widest flex items-center gap-3">
               <span className="w-4 h-4 bg-red-600 rounded-sm inline-block"></span>{" "}
-              Audit Trails <span className="text-gray-600">[Admin Only]</span>
+              Audit Trails <span className="text-text-secondary">[Admin Only]</span>
             </h3>
             <span className="px-3 py-1 bg-red-500/10 border border-red-500/20 text-red-500 text-[10px] font-black uppercase tracking-widest rounded-full">
               Live Monitoring
             </span>
           </div>
-          <div className="bg-zinc-950/50 backdrop-blur-sm border border-white/5 rounded-2xl p-8">
+          <div className="bg-bg-secondary/50 backdrop-blur-sm border border-border-theme/50 rounded-2xl p-8">
             <AuditLogList />
           </div>
         </div>
