@@ -15,6 +15,7 @@ export default function Navbar() {
   const navLinks = [
     { name: "MODULES", path: "/courses" },
     { name: "ROADMAP", path: "/roadmap" },
+    { name: "QUIZ", path: "/quiz" },
     { name: "PLAYGROUND", path: "/playground" },
     { name: "REVIEWS", path: "/peer-review" },
     { name: "SIMULATOR", path: "/simulator" },
