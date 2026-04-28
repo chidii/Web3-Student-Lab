@@ -10,7 +10,7 @@ export default function Navbar() {
   const { user, logout } = useAuth();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-  const isActive = (path: string) => pathname === path;
+  const isActive = (path: string) => pathname === path || pathname.startsWith(path + "/");
 
   const navLinks = [
     { name: "MODULES", path: "/courses" },
@@ -21,6 +21,7 @@ export default function Navbar() {
     { name: "SIMULATOR", path: "/simulator" },
     { name: "IDEAS", path: "/ideas" },
     { name: "VERIFY", path: "/verify" },
+    { name: "DEVTOOLS", path: "/devtools/events" },
   ];
 
   return (
