@@ -23,6 +23,8 @@ pub mod verification;
 // #[cfg(test)]
 // pub mod fuzz;
 pub mod token;
+pub mod savings_wallet;
+pub mod interest_accrual;
 
 use crate::revocation::{CertificateState, CertificateStatus, RevocationReason, RevocationRecord};
 use crate::token::RsTokenContractClient;
