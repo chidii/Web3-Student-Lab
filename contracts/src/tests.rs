@@ -1443,3 +1443,7 @@ mod revocation_tests {
 mod verification_tests {
     include!("tests/verification_test.rs");
 }
+
+mod savings_tests {
+    include!("tests/savings_tests.rs");
+}

@@ -35,6 +35,8 @@ pub mod quadratic_voting;
 // #[cfg(test)]
 // pub mod fuzz;
 pub mod token;
+pub mod savings_wallet;
+pub mod interest_accrual;
 pub mod blogging_platform;
 pub mod content_monetization;
 pub mod carbon_credit_platform;
@@ -2262,11 +2264,11 @@ impl CertificateContract {
     // --- Job Board Functions ---
 
     pub fn create_job(
-        env: Env, 
-        employer: Address, 
-        title: String, 
-        description: String, 
-        budget: i128, 
+        env: Env,
+        employer: Address,
+        title: String,
+        description: String,
+        budget: i128,
         milestones: Vec<Milestone>,
         required_skills: Vec<String>,
         token_addr: Address
