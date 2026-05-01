@@ -28,6 +28,8 @@ pub mod session;
 pub mod staking;
 pub mod token_gated_access;
 pub mod verification;
+pub mod token_buyback;
+pub mod burn_mechanism;
 pub mod subscription_service;
 pub mod recurring_payments;
 pub mod sybil_resistance;
