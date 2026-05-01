@@ -30,6 +30,8 @@ pub mod token_gated_access;
 pub mod verification;
 pub mod gaming_asset_exchange;
 pub mod rarity_validator;
+pub mod subscription_service;
+pub mod recurring_payments;
 pub mod token_buyback;
 pub mod burn_mechanism;
 pub mod subscription_service;
