@@ -6,6 +6,11 @@ declare var process: any;
 
 const nextConfig: NextConfig = {
   reactCompiler: true,
+  i18n: {
+    locales: ["en", "es", "zh"],
+    defaultLocale: "en",
+    localeDetection: true,
+  },
   // Bundle optimization and tree-shaking configuration
   webpack: (config: any, { buildId, dev, isServer, defaultLoaders, webpack }: any) => {
     // Optimize bundle size
