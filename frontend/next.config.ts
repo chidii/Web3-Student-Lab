@@ -1,4 +1,8 @@
 import type { NextConfig } from "next";
+import withBundleAnalyzer from "@next/bundle-analyzer";
+
+declare var process: any;
+
 
 const nextConfig: NextConfig = {
   reactCompiler: true,
@@ -8,7 +12,7 @@ const nextConfig: NextConfig = {
     localeDetection: true,
   },
   // Bundle optimization and tree-shaking configuration
-  webpack: (config, { buildId, dev, isServer, defaultLoaders, webpack }) => {
+  webpack: (config: any, { buildId, dev, isServer, defaultLoaders, webpack }: any) => {
     // Optimize bundle size
     config.optimization = {
       ...config.optimization,
@@ -70,4 +74,9 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default nextConfig;
+const analyzer = withBundleAnalyzer({
+  enabled: process.env.ANALYZE === 'true',
+});
+
+export default analyzer(nextConfig);
+
