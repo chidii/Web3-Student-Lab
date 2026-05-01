@@ -43,6 +43,7 @@ pub mod blogging_platform;
 pub mod content_monetization;
 pub mod carbon_credit_platform;
 pub mod verification_system;
+pub mod subscription_manager;
 pub mod job_board;
 pub mod skill_verification;
 pub mod timestamping;
