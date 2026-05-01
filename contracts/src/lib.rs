@@ -8,6 +8,7 @@
 #![no_std]
 
 pub mod admin;
+pub mod distribution_manager;
 pub mod dex_aggregator;
 pub mod enrollment;
 pub mod events;
@@ -17,6 +18,7 @@ pub mod payment_gateway;
 pub mod paymaster;
 pub mod reputation_system;
 pub mod revocation;
+pub mod royalty_splitter;
 pub mod route_optimizer;
 pub mod scoring_algorithm;
 pub mod smart_wallet;
@@ -24,6 +26,8 @@ pub mod sai_wrapper;
 pub mod session;
 pub mod staking;
 pub mod verification;
+pub mod subscription_service;
+pub mod recurring_payments;
 pub mod sybil_resistance;
 pub mod quadratic_voting;
 // Fuzz module uses `std` and legacy Soroban test patterns; keep out of the default test build
@@ -33,6 +37,8 @@ pub mod quadratic_voting;
 pub mod token;
 pub mod blogging_platform;
 pub mod content_monetization;
+pub mod carbon_credit_platform;
+pub mod verification_system;
 pub mod job_board;
 pub mod skill_verification;
 pub mod timestamping;
